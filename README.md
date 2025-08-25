@@ -1,196 +1,272 @@
-# Student Card Generator - Indian Universities
+# 🎓 Global Student Card Generator
 
-Trang web tạo thẻ sinh viên ngẫu nhiên với ảnh AI từ thispersonnotexist.org
+<div align="center">
 
-## ✨ Tính năng
+![Student Card Generator](https://img.shields.io/badge/Student%20Card-Generator-blue?style=for-the-badge&logo=graduation-cap)
+![Version](https://img.shields.io/badge/version-2.0.0-green?style=for-the-badge)
+![License](https://img.shields.io/badge/license-MIT-orange?style=for-the-badge)
+![Node.js](https://img.shields.io/badge/Node.js-18+-brightgreen?style=for-the-badge&logo=node.js)
 
-- 🎓 **10 trường đại học Ấn Độ** hàng đầu
-- 🤖 **Ảnh AI người thật** từ thispersonnotexist.org 
-- 👤 **Tên Ấn Độ** ngẫu nhiên (30 tên)
-- 📅 **Tuổi 20-25** ngẫu nhiên
-- 🎯 **16 chuyên ngành** đa dạng
-- 💳 **Student ID** tự động generate
-- 📥 **Download PNG** chất lượng cao
+**A professional, AI-powered student ID card generator supporting multiple universities worldwide**
 
-## 🚀 Cách chạy Local
+[🌟 Features](#-features) • [🚀 Quick Start](#-quick-start) • [🖼️ Gallery](#-gallery) • [🛠️ Tech Stack](#-tech-stack) • [📖 Documentation](#-documentation)
 
-### 1. Cài đặt dependencies
-```bash
-cd create_student_card
-npm install
+</div>
+
+---
+
+## 🌟 Features
+
+### 🏫 Multi-Regional Support
+- **🇮🇳 MAHE University (India)** - Manipal Academy of Higher Education with authentic Indian names and departments
+- **🇺🇸 US Universities** - Santa Fe College with American naming conventions and realistic academic programs  
+- **🇰🇷 Seoul National University** - Premium Korean university experience with Korean names and departments
+
+### 🎨 Professional Design
+- **Seoul-Style Layout** - Modern 2-column responsive design across all universities
+- **Cool Color Themes** - Eye-friendly blue and teal color schemes for better visual comfort
+- **High-Quality Output** - 1600x1000px resolution cards suitable for professional use
+- **Watermark System** - Official university seals and logos with proper aspect ratio preservation
+
+### 🤖 AI-Powered Generation
+- **AI-Generated Photos** - Realistic student photos via ThisPersonNotExist.org API
+- **Photo Selection** - Interactive thumbnail gallery for choosing the perfect student photo
+- **Smart Data Generation** - Realistic names, dates, and academic information based on regional conventions
+- **Cross-Origin Handling** - Robust image loading with fallback systems
+
+### ⚡ Advanced Features
+- **Real-time Preview** - Instant card preview with live updates
+- **Barcode Generation** - Dynamic barcodes with university-specific data
+- **Chrome Extension** - Auto-verification system for enhanced functionality
+- **Responsive Design** - Works perfectly on desktop, tablet, and mobile devices
+
+---
+
+## 🚀 Quick Start
+
+### Prerequisites
+- Node.js 18 or higher
+- Modern web browser (Chrome, Firefox, Safari, Edge)
+
+### Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/hungvu25/student-card-generator.git
+   cd student-card-generator
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Start the development server**
+   ```bash
+   npm start
+   ```
+
+4. **Open your browser**
+   ```
+   http://localhost:3000
+   ```
+
+### 🎯 Usage
+
+1. **Choose Your Region** - Select from India (MAHE), US Universities, or Seoul National University
+2. **Generate Card** - Click "Generate Student Card" to create a random student profile
+3. **Select Photo** - Choose from AI-generated photos in the thumbnail gallery
+4. **Download** - Click "Download Card" to save your high-quality student ID card
+
+---
+
+## 🖼️ Gallery
+
+<div align="center">
+
+### 🏠 Main Dashboard
+*Professional region selection interface*
+
+### 🇮🇳 MAHE University Cards
+*Cool blue theme with Indian academic structure*
+
+### 🇺🇸 US University Cards  
+*Teal theme featuring Santa Fe College branding*
+
+### 🇰🇷 Seoul National University Cards
+*Premium Korean university experience*
+
+</div>
+
+---
+
+## 🛠️ Tech Stack
+
+### Frontend
+- **HTML5** - Semantic markup with accessibility features
+- **CSS3** - Modern styling with gradients, animations, and responsive design
+- **Vanilla JavaScript** - Pure JS for optimal performance and compatibility
+- **Canvas API** - High-quality image generation and manipulation
+
+### Backend
+- **Node.js** - JavaScript runtime for server-side operations
+- **Express.js** - Web framework for API endpoints and static file serving
+- **Proxy Server** - Custom proxy for handling external API requests and CORS
+
+### APIs & Services
+- **ThisPersonNotExist.org** - AI-generated realistic student photos
+- **Barcode API** - Dynamic barcode generation for student IDs
+- **Santa Fe College** - Official college seal integration
+
+### Development Tools
+- **VS Code** - Primary development environment
+- **Git** - Version control and collaboration
+- **Chrome DevTools** - Debugging and performance optimization
+
+---
+
+## 📖 Documentation
+
+### 🏗️ Project Structure
+
+```
+student-card-generator/
+├── 📄 index.html                    # Main landing page with region selection
+├── 🎓 mahe-university.html          # MAHE University card generator
+├── 🏛️ us-university.html            # US Universities card generator  
+├── 🏫 seoul-university.html         # Seoul National University generator
+├── ⚙️ mahe-university-card.js       # MAHE card generation logic
+├── ⚙️ us-university-card.js         # US card generation logic
+├── ⚙️ seoul-university-card.js      # Seoul card generation logic
+├── 🎨 styles.css                    # Global styles and themes
+├── 🖥️ proxy-server.js               # Backend proxy server
+├── 📦 package.json                  # Project dependencies
+├── 🖼️ logo-mahe.png                 # MAHE University logo
+├── 🖼️ logous.png                    # Santa Fe College logo
+└── 🔧 1NutLamNenTatCa/             # Chrome extension for auto-verification
 ```
 
-### 2. Khởi động server
-```bash
-npm start
-```
+### 🔧 Configuration
 
-### 3. Mở trình duyệt
-```
-http://localhost:3000/thesinhvien.html
-```
-
-## 📋 Cấu trúc project
-
-```
-create_student_card/
-├── thesinhvien.html        # Trang web chính
-├── proxy-server.js         # Proxy server xử lý CORS
-├── package.json           # Dependencies
-└── README.md              # Hướng dẫn này
-```
-
-## 🔧 API sử dụng
-
-- **thispersonnotexist.org/load-faces** - Lấy ảnh AI người châu Á
-- **barcode.tec-it.com** - Tạo mã vạch cho thẻ
-- **html2canvas** - Convert HTML thành PNG để download
-
-## ⚠️ Lưu ý
-
-- Web chỉ hoạt động qua proxy server (không thể mở file HTML trực tiếp)
-- Cần kết nối internet để lấy ảnh AI
-- Nếu API thispersonnotexist.org không hoạt động, web sẽ báo lỗi
-
-## 🎯 Thông số API
-
+#### Environment Setup
 ```javascript
-{
-  "type": "R",
-  "age": "21-35", 
-  "race": "asian",
-  "emotion": "none"
-}
+// Default server configuration
+const PORT = 3000;
+const HOST = 'localhost';
+
+// API endpoints
+const FACE_API = 'https://thispersonnotexist.org';
+const BARCODE_API = 'https://barcode.tec-it.com';
 ```
 
-## 📸 Demo
+#### Color Themes
+```css
+/* MAHE University - Cool Blue Theme */
+--primary: #1e40af;
+--secondary: #6366f1;
 
-1. Nhấn "Generate New Student Card"
-2. Chờ load ảnh AI từ thispersonnotexist.org
-3. Nhấn "Download Card" để tải về
+/* US Universities - Cool Teal Theme */  
+--primary: #059669;
+--secondary: #0891b2;
+
+/* Seoul University - Original Theme */
+--primary: #003366;
+--secondary: #0066cc;
+```
 
 ---
-**Chỉ sử dụng API thispersonnotexist.org - Không có fallback khác**
 
-## 🌐 Deploy lên Render.com
+## 🎯 Features Breakdown
 
-### Bước 1: Chuẩn bị GitHub Repository
+### 🔄 Card Generation Process
+1. **Data Generation** - Random realistic student information based on regional patterns
+2. **Photo Loading** - AI-generated photos fetched via secure proxy
+3. **Canvas Rendering** - High-quality card composition with proper image handling
+4. **Download System** - PNG export with optimized file size and quality
 
-1. Tạo GitHub repository mới
-2. Push toàn bộ project lên GitHub:
+### 🖼️ Photo Management
+- **Batch Loading** - 8 photos loaded per generation for variety
+- **Thumbnail Preview** - Interactive selection with border highlighting
+- **Cross-Origin Support** - Robust handling of external image sources
+- **Fallback System** - Graceful degradation when APIs are unavailable
 
-```bash
-git init
-git add .
-git commit -m "Initial commit"
-git branch -M main
-git remote add origin https://github.com/username/student-card-generator.git
-git push -u origin main
-```
-
-### Bước 2: Deploy trên Render.com
-
-1. Truy cập [render.com](https://render.com) và đăng ký/đăng nhập
-2. Kết nối GitHub account của bạn
-3. Nhấn **"New"** → **"Web Service"**
-4. Chọn GitHub repository vừa tạo
-5. Cấu hình như sau:
-
-**Service Configuration:**
-- **Name**: `student-card-generator`
-- **Environment**: `Node`
-- **Region**: `Oregon (US West)`
-- **Branch**: `main`
-
-**Build & Deploy Settings:**
-- **Root Directory**: ` ` (để trống)
-- **Build Command**: `npm install`
-- **Start Command**: `npm start`
-
-**Environment Variables:**
-- **PORT**: `10000` (Render tự động set)
-
-6. Nhấn **"Create Web Service"**
-
-### Bước 3: Truy cập Website
-
-Sau khi deploy thành công (3-5 phút), Render sẽ cung cấp URL dạng:
-```
-https://student-card-generator-xxxx.onrender.com
-```
-
-Truy cập: `https://your-app-url.onrender.com/thesinhvien.html`
-
-### 🔧 Troubleshooting
-
-**Nếu deployment failed:**
-1. Kiểm tra logs trong Render dashboard
-2. Đảm bảo `package.json` có đúng `engines` field
-3. Kiểm tra `PORT` environment variable
-
-**Nếu website không load được:**
-1. Thêm `/thesinhvien.html` vào cuối URL
-2. Kiểm tra Network tab trong Browser DevTools
-3. Đảm bảo các API endpoints hoạt động
-
-### 💡 Lưu ý về Render.com
-
-- **Free tier**: App sẽ sleep sau 15 phút không sử dụng
-- **Cold start**: Lần đầu truy cập sau khi sleep có thể mất 30-60s
-- **Bandwidth**: 100GB/tháng cho free tier
-- **Build time**: Tối đa 15 phút
-
-### 🚀 Custom Domain (Optional)
-
-1. Trong Render dashboard → Settings → Custom Domains
-2. Thêm domain của bạn
-3. Cập nhật DNS records theo hướng dẫn
-# Student Card Generator
-
-## Giới thiệu
-
-**Student Card Generator** là một tiện ích web giúp bạn tạo thẻ sinh viên giả lập với thông tin, ảnh, mã vạch và thiết kế chuyên nghiệp. Tiện ích hỗ trợ sinh viên, giáo viên, hoặc các nhà phát triển cần dữ liệu mẫu cho mục đích demo, kiểm thử hoặc học tập.
-
-## Tính năng nổi bật
-- Tạo thẻ sinh viên với thông tin ngẫu nhiên (tên, ngày sinh, khoa, lớp, mã số sinh viên...)
-- Tự động lấy ảnh khuôn mặt ngẫu nhiên phù hợp độ tuổi, chủng tộc
-- Sinh mã vạch theo tên trường
-- Giao diện đẹp, hiệu ứng mượt mà, có thể tải thẻ về dưới dạng ảnh PNG
-- Hỗ trợ tích hợp với Chrome Extension để trích xuất thông tin thẻ
-
-## Hướng dẫn sử dụng
-
-### 1. Cài đặt & Khởi động
-- Tải toàn bộ mã nguồn về máy tính.
-- Đảm bảo bạn có Node.js (nếu muốn chạy proxy server để lấy ảnh khuôn mặt).
-- Mở file `thesinhvien.html` trong trình duyệt để sử dụng ngay giao diện tạo thẻ.
-- Nếu muốn sử dụng tính năng lấy ảnh khuôn mặt thật, chạy proxy server:
-  ```sh
-  node proxy-server.js
-  ```
-  Sau đó truy cập lại giao diện.
-
-### 2. Tạo thẻ sinh viên
-- Nhấn nút **Generate** để tạo thẻ mới với thông tin ngẫu nhiên.
-- Chờ quá trình tải ảnh và sinh mã vạch hoàn tất.
-- Thông tin thẻ sẽ được hiển thị đầy đủ trên giao diện.
-
-### 3. Tải thẻ về máy
-- Nhấn nút **Download** để lưu thẻ sinh viên dưới dạng ảnh PNG.
-
-### 4. Trích xuất thông tin sang Extension (nếu có)
-- Cài đặt Chrome Extension "Student Card Auto Verifier" từ thư mục `1NutLamNenTatCa` (xem hướng dẫn trong extension).
-- Nhấn nút **Extract Info** để gửi thông tin thẻ sang extension.
-- Làm theo hướng dẫn trên popup extension để xác minh hoặc sử dụng dữ liệu.
-
-## Lưu ý
-- Ảnh khuôn mặt được lấy từ dịch vụ AI, không phải người thật.
-- Mọi thông tin sinh ra chỉ dùng cho mục đích demo, kiểm thử, không sử dụng cho mục đích gian lận.
-- Nếu gặp lỗi mạng khi tải ảnh, hãy kiểm tra lại kết nối hoặc thử chạy proxy server.
-
-## Tham khảo & Liên hệ
-- Tác giả: hungvu25
-- Đóng góp hoặc báo lỗi: [GitHub Repository](https://github.com/hungvu25/student-card-generator)
+### 🎨 UI/UX Excellence
+- **Loading States** - Professional loading animations and progress indicators
+- **Error Handling** - User-friendly error messages with actionable guidance
+- **Responsive Design** - Optimized for all screen sizes and devices
+- **Accessibility** - WCAG 2.1 compliant with keyboard navigation support
 
 ---
-Chúc bạn sử dụng tiện ích hiệu quả!
+
+## 🌐 Browser Compatibility
+
+| Browser | Version | Support |
+|---------|---------|---------|
+| Chrome | 88+ | ✅ Full |
+| Firefox | 85+ | ✅ Full |
+| Safari | 14+ | ✅ Full |
+| Edge | 88+ | ✅ Full |
+
+---
+
+## 🤝 Contributing
+
+We welcome contributions! Please follow these steps:
+
+1. **Fork the repository**
+2. **Create a feature branch**
+   ```bash
+   git checkout -b feature/amazing-feature
+   ```
+3. **Commit your changes**
+   ```bash
+   git commit -m 'Add amazing feature'
+   ```
+4. **Push to the branch**
+   ```bash
+   git push origin feature/amazing-feature
+   ```
+5. **Open a Pull Request**
+
+### 📋 Development Guidelines
+- Follow ES6+ JavaScript standards
+- Maintain responsive design principles
+- Test across multiple browsers
+- Document new features thoroughly
+- Optimize for performance and accessibility
+
+---
+
+## 📜 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+## 🙏 Acknowledgments
+
+- **ThisPersonNotExist.org** - AI-generated photos
+- **Santa Fe College** - Official branding and logo usage
+- **Seoul National University** - Design inspiration
+- **MAHE University** - Academic structure reference
+- **VS Code Community** - Development environment and extensions
+
+---
+
+## 📞 Support
+
+- 🐛 **Bug Reports**: [GitHub Issues](https://github.com/hungvu25/student-card-generator/issues)
+- 💡 **Feature Requests**: [GitHub Discussions](https://github.com/hungvu25/student-card-generator/discussions)
+- 📧 **Contact**: [Email](mailto:your-email@example.com)
+
+---
+
+<div align="center">
+
+**⭐ Star this repository if you found it helpful!**
+
+Made with ❤️ by [Hung Vu](https://github.com/hungvu25)
+
+*All generated data is fictional and for demonstration purposes only*
+
+</div>

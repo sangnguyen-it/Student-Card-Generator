@@ -180,6 +180,24 @@ body {
     animation: cardAppear 0.6s ease-out;
 }
 
+/* Watermark cho MAHE University */
+body:has([href*="mahe-university"]) .card::before,
+body:has([onclick*="generateStudentCard"]) .card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url('https://d2u1z1lopyfwlx.cloudfront.net/thumbnails/6e54d443-8cb6-5dfa-9a7d-a84615bba494/26da5ce4-1888-576f-b8f8-1074c084014e.jpg');
+    background-size: 50%;
+    background-repeat: no-repeat;
+    background-position: center;
+    opacity: 0.05;
+    z-index: 1;
+    pointer-events: none;
+}
+
 .card:hover {
     transform: translateY(-5px);
     box-shadow: 0 20px 40px rgba(0,0,0,0.15), 0 8px 20px rgba(0,0,0,0.1);
@@ -205,6 +223,7 @@ body {
     display: flex;
     align-items: center;
     gap: 20px;
+    z-index: 2;
 }
 
 .header::before {
@@ -256,6 +275,8 @@ body {
     flex-wrap: wrap;
     padding: 20px 30px 0 30px;
     gap: 25px;
+    position: relative;
+    z-index: 2;
 }
 
 .avatar {
@@ -379,6 +400,8 @@ body {
         flex-direction: column;
         align-items: center;
         text-align: center;
+        position: relative;
+        z-index: 2;
     }
     
     .details {
@@ -440,4 +463,37 @@ body {
 
 .notification.info {
     border-left: 4px solid #2196F3;
+}
+
+/* Watermarks for specific universities */
+.us-university-watermark::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url('https://www.sfcollege.edu/_media/news/000-seal.png');
+    background-size: 300px 300px;
+    background-repeat: no-repeat;
+    background-position: center;
+    opacity: 0.1;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.mahe-university-watermark::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url('https://d2u1z1lopyfwlx.cloudfront.net/thumbnails/6e54d443-8cb6-5dfa-9a7d-a84615bba494/26da5ce4-1888-576f-b8f8-1074c084014e.jpg');
+    background-size: 300px 300px;
+    background-repeat: no-repeat;
+    background-position: center;
+    opacity: 0.1;
+    pointer-events: none;
+    z-index: 1;
 }

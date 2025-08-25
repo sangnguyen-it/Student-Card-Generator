@@ -18,21 +18,70 @@ app.get('/', (req, res) => {
     res.redirect('/index.html');
 });
 
-// Route for Indian universities page
+// Route for MAHE university page (Indian)
 app.get('/india', (req, res) => {
-    res.redirect('/thesinhvien.html');
+    res.redirect('/mahe-university.html');
+});
+
+app.get('/mahe', (req, res) => {
+    res.redirect('/mahe-university.html');
 });
 
 // Route for US universities page
 app.get('/us', (req, res) => {
-    res.redirect('/thesinhvienus.html');
+    res.redirect('/us-university.html');
 });
 
-// Proxy endpoint for thispersonnotexist.org
+// Route for Seoul National University page (Korean)
+app.get('/korea', (req, res) => {
+    res.redirect('/seoul-university.html');
+});
+
+app.get('/seoul', (req, res) => {
+    res.redirect('/seoul-university.html');
+});
+
+app.get('/snu', (req, res) => {
+    res.redirect('/seoul-university.html');
+});
+
+// Proxy endpoint for thispersonnotexist.org with country-specific configurations
 app.post('/api/load-faces', async (req, res) => {
     try {
         console.log('📡 Proxying request to thispersonnotexist.org...');
         console.log('Request body:', req.body);
+        
+        // Default configuration for different countries/universities
+        let requestBody = req.body;
+        
+        // If no specific configuration, apply defaults based on source
+        if (!requestBody.race) {
+            const userAgent = req.get('User-Agent') || '';
+            const referer = req.get('Referer') || '';
+            
+            if (referer.includes('seoul-university') || referer.includes('korea')) {
+                requestBody = {
+                    ...requestBody,
+                    race: 'asian',
+                    age: '18-25'
+                };
+                console.log('🇰🇷 Applying Korean/Asian configuration');
+            } else if (referer.includes('us-university')) {
+                requestBody = {
+                    ...requestBody,
+                    race: 'mixed',
+                    age: '18-25'
+                };
+                console.log('🇺🇸 Applying US mixed race configuration');
+            } else if (referer.includes('mahe-university')) {
+                requestBody = {
+                    ...requestBody,
+                    race: 'asian',
+                    age: '18-25'
+                };
+                console.log('🇮🇳 Applying Indian/Asian configuration');
+            }
+        }
         
         const response = await fetch('https://thispersonnotexist.org/load-faces', {
             method: 'POST',
@@ -43,14 +92,13 @@ app.post('/api/load-faces', async (req, res) => {
                 'Origin': 'https://thispersonnotexist.org',
                 'Referer': 'https://thispersonnotexist.org/'
             },
-            body: JSON.stringify(req.body)
+            body: JSON.stringify(requestBody)
         });
 
         if (response.ok) {
             const data = await response.json();
             console.log('✅ Success! Got', data.fc?.length || 0, 'faces');
             console.log('📋 First face data sample:', data.fc?.[0]?.substring(0, 50) + '...');
-            console.log('📋 Full response structure:', JSON.stringify(data, null, 2));
             res.json(data);
         } else {
             console.error('❌ API Error:', response.status, response.statusText);
@@ -102,11 +150,31 @@ app.get('/api/image/:base64path', async (req, res) => {
     }
 });
 
-// Proxy endpoint để serve barcode từ barcode.tec-it.com (giải quyết CORS cho html2canvas)
+// Proxy endpoint để serve barcode từ barcode.tec-it.com với thông tin tùy chỉnh theo trường
 app.get('/api/barcode', async (req, res) => {
     try {
-        const { data, code } = req.query;
-        const barcodeUrl = `https://barcode.tec-it.com/barcode.ashx?data=${encodeURIComponent(data)}&code=${code || 'Code128'}&translate-esc=false`;
+        let { data, code, university } = req.query;
+        
+        // Customize barcode data based on university
+        if (university) {
+            switch (university.toLowerCase()) {
+                case 'snu':
+                case 'seoul':
+                    data = `SNU-${data}`;
+                    break;
+                case 'mahe':
+                    data = `MAHE-${data}`;
+                    break;
+                case 'us':
+                    data = `US-UNIV-${data}`;
+                    break;
+                case 'webbience':
+                    data = `WEBBIENCE-${data}`;
+                    break;
+            }
+        }
+        
+        const barcodeUrl = `https://barcode.tec-it.com/barcode.ashx?data=${encodeURIComponent(data)}&code=${code || 'Code128'}&translate-esc=false&dpi=200&imagetype=png`;
         
         console.log('📊 Proxying barcode request:', barcodeUrl);
         
@@ -137,8 +205,72 @@ app.get('/api/barcode', async (req, res) => {
     }
 });
 
+// API endpoint to get university information
+app.get('/api/universities', (req, res) => {
+    const universities = [
+        {
+            id: 'mahe',
+            name: 'Manipal Academy of Higher Education',
+            shortName: 'MAHE',
+            country: 'India',
+            flag: '🇮🇳',
+            url: '/mahe-university.html',
+            features: ['Indian Names', 'MAHE Branding', '16 Departments', 'AI Photos']
+        },
+        {
+            id: 'us',
+            name: 'US Universities',
+            shortName: 'US',
+            country: 'United States',
+            flag: '🇺🇸',
+            url: '/us-university.html',
+            features: ['American Names', '15+ Universities', '15 Schools', 'AI Photos']
+        },
+        {
+            id: 'snu',
+            name: 'Seoul National University',
+            shortName: 'SNU',
+            country: 'South Korea',
+            flag: '🇰🇷',
+            url: '/seoul-university.html',
+            features: ['Korean Names', 'SNU Branding', '35+ Departments', 'Asian AI Photos']
+        },
+        {
+            id: 'webbience',
+            name: 'Webbience National Public School',
+            shortName: 'WEBBIENCE',
+            country: 'Custom',
+            flag: '🏫',
+            url: '/webbience-school.html',
+            features: ['Custom Input', 'Photo Upload', 'Manual Entry', 'PNG Download']
+        }
+    ];
+    
+    res.json(universities);
+});
+
+// API endpoint to get statistics
+app.get('/api/stats', (req, res) => {
+    const stats = {
+        totalUniversities: 4,
+        totalCountries: 3,
+        totalNames: '100+',
+        features: ['Global Coverage', 'Secure Generation', 'AI Photos', 'Multiple Formats']
+    };
+    
+    res.json(stats);
+});
+
 app.listen(PORT, () => {
     console.log(`🚀 Proxy server running on http://localhost:${PORT}`);
     console.log(`📂 Serving files from: ${__dirname}`);
-    console.log(`🌐 Open http://localhost:${PORT}/thesinhvien.html in your browser`);
+    console.log(`🌐 Available pages:`);
+    console.log(`   📋 Main Menu: http://localhost:${PORT}/index.html`);
+    console.log(`   🇮🇳 MAHE University: http://localhost:${PORT}/mahe-university.html`);
+    console.log(`   🇺🇸 US Universities: http://localhost:${PORT}/us-university.html`);
+    console.log(`   🇰🇷 Seoul National University: http://localhost:${PORT}/seoul-university.html`);
+    console.log(`\n📍 Quick access routes:`);
+    console.log(`   /india or /mahe → MAHE University`);
+    console.log(`   /us → US Universities`);
+    console.log(`   /korea, /seoul, or /snu → Seoul National University`);
 });

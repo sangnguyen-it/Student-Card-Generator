@@ -164,16 +164,27 @@ function showPhotoSelection(photoList, selectedIndex = 0) {
     if (!container) {
         container = document.createElement('div');
         container.id = 'photo-selection';
-        container.style.display = 'flex';
-        container.style.gap = '10px';
-        container.style.margin = '0 0 16px 0';
-        container.style.justifyContent = 'center';
-        container.style.flexWrap = 'wrap';
-        // Đặt container phía trên card
-        const card = document.querySelector('.card');
-        card.parentNode.insertBefore(container, card);
+        // Đặt container vào trong controls panel
+        const controlsPanel = document.querySelector('.controls');
+        controlsPanel.appendChild(container);
     }
     container.innerHTML = '';
+    
+    // Tạo header cho photo selection
+    const header = document.createElement('h4');
+    header.textContent = '📸 Chọn ảnh sinh viên';
+    header.style.color = '#059669';
+    header.style.marginBottom = '10px';
+    header.style.marginTop = '0';
+    container.appendChild(header);
+    
+    // Tạo container cho thumbnails
+    const thumbnailContainer = document.createElement('div');
+    thumbnailContainer.style.display = 'flex';
+    thumbnailContainer.style.gap = '10px';
+    thumbnailContainer.style.justifyContent = 'center';
+    thumbnailContainer.style.flexWrap = 'wrap';
+    
     photoList.forEach((url, idx) => {
         const img = document.createElement('img');
         img.src = url;
@@ -182,16 +193,18 @@ function showPhotoSelection(photoList, selectedIndex = 0) {
         img.style.height = '75px';
         img.style.objectFit = 'cover';
         img.style.borderRadius = '6px';
-        img.style.border = idx === selectedIndex ? '3px solid #1a7ec7' : '2px solid #ccc';
+        img.style.border = idx === selectedIndex ? '3px solid #059669' : '2px solid #ccc';
         img.style.cursor = 'pointer';
         img.title = 'Chọn ảnh này';
         img.onclick = () => {
-            document.getElementById('student-photo').src = url;
+            document.getElementById('student-photo-img').src = url;
             showPhotoSelection(photoList, idx);
         };
-        container.appendChild(img);
+        thumbnailContainer.appendChild(img);
     });
-    container.style.display = 'flex';
+    
+    container.appendChild(thumbnailContainer);
+    container.classList.add('show');
 }
 function getRandomElement(array) {
     return array[Math.floor(Math.random() * array.length)];
@@ -282,14 +295,14 @@ async function generateUSStudentCard() {
         document.getElementById('student-course').textContent = course;
         document.getElementById('student-class').textContent = major;
         document.getElementById('student-department').textContent = school;
-        document.getElementById('student-id').innerHTML = `🆔 Student ID: ${studentID}`;
+        document.getElementById('student-id').innerHTML = `Student ID: ${studentID}`;
         document.getElementById('valid-until').textContent = validUntil;
 
         // Load images with progress feedback
         btnText.innerHTML = '<span class="loading-spinner"></span>Loading Images...';
 
         document.getElementById('university-logo').src = university.logo;
-        document.getElementById('student-photo').src = studentPhoto;
+        document.getElementById('student-photo-img').src = studentPhoto;
 
         // Hiển thị danh sách thumbnail cho người dùng chọn
         showPhotoSelection(studentPhotoList, randomIndex);
@@ -386,38 +399,104 @@ async function drawCardManually() {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
     
-    // Kích thước canvas vừa khít thẻ sinh viên
-    canvas.width = 1400;
-    canvas.height = 1050;
+    // Enhanced canvas size for higher quality
+    canvas.width = 1600;
+    canvas.height = 1000;
 
-    // Không vẽ nền ngoài, chỉ vẽ thẻ sinh viên
+    // Card positioning and sizing
     const cardX = 0, cardY = 0;
-    const cardWidth = 1400, cardHeight = 1050;
-
-    // Card shadow (tùy chọn, có thể bỏ qua nếu muốn nền trong suốt)
-    // ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
-    // ctx.fillRect(cardX + 8, cardY + 8, cardWidth, cardHeight);
+    const cardWidth = 1600, cardHeight = 1000;
 
     // Card background
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(cardX, cardY, cardWidth, cardHeight);
     
-    // Card border với rounded corners
+    // Add watermark background
+    try {
+        const watermarkImg = new Image();
+        watermarkImg.crossOrigin = 'anonymous';
+        
+        await new Promise((resolve) => {
+            watermarkImg.onload = () => {
+                console.log('Santa Fe College watermark loaded successfully');
+                resolve();
+            };
+            watermarkImg.onerror = (e) => {
+                console.warn('Santa Fe College watermark failed to load:', e);
+                resolve();
+            };
+            watermarkImg.src = 'https://www.sfcollege.edu/_media/news/000-seal.png';
+            setTimeout(() => {
+                console.log('Santa Fe College watermark timeout reached');
+                resolve();
+            }, 5000);
+        });
+        
+        if (watermarkImg.complete && watermarkImg.naturalWidth > 0) {
+            console.log('Drawing Santa Fe College seal as watermark to canvas');
+            ctx.save();
+            ctx.globalAlpha = 0.15; // Slightly more visible for official seal
+            
+            // Calculate proper aspect ratio for watermark
+            const maxWatermarkSize = 900; // Tăng từ 380 lên 500 để watermark to hơn
+            const aspectRatio = watermarkImg.naturalWidth / watermarkImg.naturalHeight;
+            let watermarkWidth, watermarkHeight;
+            
+            if (aspectRatio > 1) {
+                // Landscape: width is larger
+                watermarkWidth = maxWatermarkSize;
+                watermarkHeight = maxWatermarkSize / aspectRatio;
+            } else {
+                // Portrait or square: height is larger or equal
+                watermarkHeight = maxWatermarkSize;
+                watermarkWidth = maxWatermarkSize * aspectRatio;
+            }
+            
+            const watermarkX = (cardWidth - watermarkWidth) / 2;
+            const watermarkY = (cardHeight - watermarkHeight) / 2;
+            ctx.drawImage(watermarkImg, watermarkX, watermarkY, watermarkWidth, watermarkHeight);
+            ctx.restore();
+        } else {
+            console.warn('Santa Fe College watermark not ready, drawing fallback');
+            // Fallback watermark using text
+            ctx.save();
+            ctx.globalAlpha = 0.15;
+            ctx.font = 'bold 48px Arial';
+            ctx.fillStyle = '#1e3a8a';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('SANTA FE COLLEGE', cardWidth / 2, cardHeight / 2);
+            ctx.restore();
+        }
+    } catch (e) {
+        console.warn('Watermark loading failed, using fallback:', e);
+        // Fallback watermark using Santa Fe College name
+        ctx.save();
+        ctx.globalAlpha = 0.15;
+        ctx.font = 'bold 48px Arial';
+        ctx.fillStyle = '#1e3a8a';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('SANTA FE COLLEGE', cardWidth / 2, cardHeight / 2);
+        ctx.restore();
+    }
+    
+    // Card border with rounded corners
     ctx.strokeStyle = '#222222';
     ctx.lineWidth = 4;
     ctx.strokeRect(cardX, cardY, cardWidth, cardHeight);
 
-    // Header background
-    const headerHeight = 210;
+    // Header background - enhanced height
+    const headerHeight = 240;
     ctx.fillStyle = '#6a9ed8';
     ctx.fillRect(cardX, cardY, cardWidth, headerHeight);
     
-    // Load và vẽ logo university (ưu tiên local logo nếu có)
+    // Load and draw university logo (enlarged to 400px)
     try {
         const logoImg = new Image();
         let logoSrc = document.getElementById('university-logo').src;
-        if (logoSrc.includes('MUlogo-scaled.jpg') || logoSrc.includes('mahe')) {
-            logoSrc = 'logo-mahe.png';
+        if (logoSrc.includes('logous.png')) {
+            logoSrc = 'logous.png';
         }
         if (!logoSrc.startsWith('http')) {
             logoImg.crossOrigin = null;
@@ -431,8 +510,8 @@ async function drawCardManually() {
             setTimeout(resolve, 3000);
         });
         if (logoImg.complete && logoImg.naturalWidth > 0) {
-            // Fit logo to header, max height = headerHeight - 40, max width = 220
-            const maxLogoWidth = 220;
+            // Enhanced logo size to match Seoul University improvements
+            const maxLogoWidth = 400;
             const maxLogoHeight = headerHeight - 40;
             let drawWidth = maxLogoWidth;
             let drawHeight = maxLogoWidth * (logoImg.naturalHeight / logoImg.naturalWidth);
@@ -440,24 +519,24 @@ async function drawCardManually() {
                 drawHeight = maxLogoHeight;
                 drawWidth = maxLogoHeight * (logoImg.naturalWidth / logoImg.naturalHeight);
             }
-            const logoX = cardX + 40;
+            const logoX = cardX + 50;
             const logoY = cardY + (headerHeight - drawHeight) / 2;
             ctx.fillStyle = '#ffffff';
-            ctx.fillRect(logoX - 6, logoY - 6, drawWidth + 12, drawHeight + 12);
+            ctx.fillRect(logoX - 8, logoY - 8, drawWidth + 16, drawHeight + 16);
             ctx.drawImage(logoImg, logoX, logoY, drawWidth, drawHeight);
         } else {
-            // Logo placeholder
-            const maxLogoWidth = 220;
+            // Logo placeholder with enhanced size
+            const maxLogoWidth = 400;
             const maxLogoHeight = headerHeight - 40;
-            const logoX = cardX + 40;
+            const logoX = cardX + 50;
             const logoY = cardY + (headerHeight - maxLogoHeight) / 2;
             ctx.fillStyle = '#ffffff';
-            ctx.fillRect(logoX - 6, logoY - 6, maxLogoWidth + 12, maxLogoHeight + 12);
+            ctx.fillRect(logoX - 8, logoY - 8, maxLogoWidth + 16, maxLogoHeight + 16);
             ctx.strokeStyle = '#cccccc';
             ctx.lineWidth = 3;
-            ctx.strokeRect(logoX - 6, logoY - 6, maxLogoWidth + 12, maxLogoHeight + 12);
+            ctx.strokeRect(logoX - 8, logoY - 8, maxLogoWidth + 16, maxLogoHeight + 16);
             ctx.fillStyle = '#666666';
-            ctx.font = 'bold 32px Arial';
+            ctx.font = 'bold 36px Segoe UI, Arial';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillText('LOGO', logoX + maxLogoWidth / 2, logoY + maxLogoHeight / 2);
@@ -466,51 +545,65 @@ async function drawCardManually() {
         console.warn('Logo loading failed:', e);
     }
     
-    // University name - bắt đầu từ bên phải logo
+    // University name - enhanced typography to match Seoul University
     ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 54px Arial';
+    ctx.font = 'bold 58px Segoe UI, Arial';
     ctx.textAlign = 'left';
     const universityName = document.getElementById('university-name').textContent;
 
-    const textStartX = cardX + 300;
-    const maxTextWidth = 900;
+    const textStartX = cardX + 480;
+    const maxTextWidth = 1000;
     const lines = wrapText(ctx, universityName, maxTextWidth);
-    const totalTextHeight = lines.length * 60 + 60 + 20;
-    let textY = cardY + (headerHeight - totalTextHeight) / 2 + 54;
+    const totalTextHeight = lines.length * 68 + 68 + 24;
+    let textY = cardY + (headerHeight - totalTextHeight) / 2 + 58;
     lines.forEach((line, index) => {
-        ctx.fillText(line, textStartX, textY + (index * 60));
+        ctx.fillText(line, textStartX, textY + (index * 68));
     });
     ctx.fillStyle = '#cc0000';
-    ctx.font = 'bold 44px Arial';
-    const studentCardY = textY + (lines.length * 60) + 20;
-    ctx.fillText('STUDENT CARD', textStartX, studentCardY);
+    ctx.font = 'bold 48px Segoe UI, Arial';
+    const studentCardY = textY + (lines.length * 68) + 24;
+    ctx.fillText('STUDENT ID CARD', textStartX, studentCardY);
     
-    // Info section - bắt đầu dưới header
-    // Info section - bắt đầu dưới header, căn đều với ảnh
-    const infoY = cardY + headerHeight + 36;
+    // Info section - enhanced spacing and positioning
+    const infoY = cardY + headerHeight + 50;
     
-    // Load và vẽ student photo
+    // Load and draw student photo - enhanced size
     let photoBottomY = infoY;
     try {
         const photoImg = new Image();
-        photoImg.crossOrigin = 'anonymous';
+        const photoSrc = document.getElementById('student-photo-img').src;
+        
+        // Only set crossOrigin for external URLs
+        if (photoSrc.startsWith('http') && !photoSrc.includes('localhost')) {
+            photoImg.crossOrigin = 'anonymous';
+        }
+        
         await new Promise((resolve) => {
-            photoImg.onload = resolve;
-            photoImg.onerror = resolve;
-            photoImg.src = document.getElementById('student-photo').src;
-            setTimeout(resolve, 3000);
+            photoImg.onload = () => {
+                console.log('Student photo loaded successfully for canvas');
+                resolve();
+            };
+            photoImg.onerror = (e) => {
+                console.warn('Student photo failed to load for canvas:', e);
+                resolve();
+            };
+            photoImg.src = photoSrc;
+            setTimeout(() => {
+                console.log('Student photo timeout reached');
+                resolve();
+            }, 3000);
         });
 
-        // Photo dimensions scaled lớn hơn
-        const photoWidth = 200;
-        const photoHeight = 250;
-        const photoX = cardX + 60;
+        // Enhanced photo dimensions
+        const photoWidth = 220;
+        const photoHeight = 270;
+        const photoX = cardX + 70;
         const photoY = infoY;
         photoBottomY = photoY + photoHeight;
 
         if (photoImg.complete && photoImg.naturalWidth > 0) {
             ctx.strokeStyle = '#888888';
-            ctx.lineWidth = 5;
+            ctx.lineWidth = 6;
             ctx.strokeRect(photoX, photoY, photoWidth, photoHeight);
 
             ctx.save();
@@ -523,10 +616,10 @@ async function drawCardManually() {
             ctx.fillStyle = '#eeeeee';
             ctx.fillRect(photoX, photoY, photoWidth, photoHeight);
             ctx.strokeStyle = '#888888';
-            ctx.lineWidth = 5;
+            ctx.lineWidth = 6;
             ctx.strokeRect(photoX, photoY, photoWidth, photoHeight);
             ctx.fillStyle = '#666666';
-            ctx.font = 'bold 22px Arial';
+            ctx.font = 'bold 26px Segoe UI, Arial';
             ctx.textAlign = 'center';
             ctx.fillText('PHOTO', photoX + photoWidth/2, photoY + photoHeight/2);
         }
@@ -534,50 +627,48 @@ async function drawCardManually() {
         console.warn('Photo loading failed:', e);
     }
     
-    // Student details - positioning bên phải photo
+    // Student details - enhanced typography and positioning
     ctx.textAlign = 'left';
-    const detailsX = cardX + 300;
+    const detailsX = cardX + 340;
 
     const details = [
         { label: 'Name:', value: document.getElementById('student-name').textContent, bold: true },
         { label: 'Date of Birth:', value: document.getElementById('student-dob').textContent },
-        { label: 'Course:', value: document.getElementById('student-course').textContent },
-        { label: 'Class:', value: document.getElementById('student-class').textContent },
+        { label: 'Program:', value: document.getElementById('student-course').textContent },
+        { label: 'Major:', value: document.getElementById('student-class').textContent },
         { label: 'Department:', value: document.getElementById('student-department').textContent }
     ];
 
     details.forEach((detail, index) => {
-        // Căn đều với ảnh, mỗi dòng 56px, bắt đầu từ top ảnh
-        const y = infoY + 24 + (index * 56);
+        // Enhanced spacing to match Seoul University improvements
+        const y = infoY + 34 + (index * 64);
 
         ctx.fillStyle = '#1a7ec7';
-        ctx.font = 'bold 32px Arial';
+        ctx.font = 'bold 34px Segoe UI, Arial';
 
-        // Tăng khoảng cách label-value cho dòng Date of Birth để tránh đè lên tên
-        let labelWidth = 170;
-        let valueOffset = 16;
+        // Enhanced spacing for better readability
+        let labelWidth = 180;
+        let valueOffset = 20;
         if (detail.label === 'Date of Birth:') {
-            labelWidth = 210; // đẩy value sang phải hơn
-            valueOffset = 28;
+            labelWidth = 220;
+            valueOffset = 32;
         }
 
         ctx.fillText(detail.label, detailsX, y);
 
         ctx.fillStyle = '#000000';
-        ctx.font = detail.bold ? 'bold 36px Arial' : '32px Arial';
+        ctx.font = detail.bold ? 'bold 40px Segoe UI, Arial' : '36px Segoe UI, Arial';
         ctx.fillText(detail.value, detailsX + labelWidth + valueOffset, y);
     });
     
-    // Valid until - match CSS .footer positioning
-    // Căn dòng Valid until sát dưới ảnh
+    // Valid until - enhanced positioning below photo
     ctx.fillStyle = '#444444';
-    ctx.font = '24px Arial';
+    ctx.font = '28px Segoe UI, Arial';
     const validText = `Valid until: ${document.getElementById('valid-until').textContent}`;
-    const validY = photoBottomY + 28;
-    ctx.fillText(validText, cardX + 60, validY);
+    const validY = photoBottomY + 40;
+    ctx.fillText(validText, cardX + 70, validY);
     
-    // Load và vẽ barcode thật từ API
-    // Barcode nằm sát dưới dòng Valid until, không đè lên chữ
+    // Load and draw barcode - repositioned lower with better spacing
     try {
         const barcodeImg = new Image();
         barcodeImg.crossOrigin = 'anonymous';
@@ -588,10 +679,11 @@ async function drawCardManually() {
             setTimeout(resolve, 3000);
         });
 
-        const barcodeY = validY + 32;
-        const barcodeStartX = cardX + 60;
-        const barcodeWidth = 1180;
-        const barcodeHeight = 80;
+        // Enhanced barcode positioning - moved lower to avoid crowding
+        const barcodeY = validY + 50;
+        const barcodeStartX = cardX + 70;
+        const barcodeWidth = 1350;
+        const barcodeHeight = 90;
 
         if (barcodeImg.complete && barcodeImg.naturalWidth > 0) {
             ctx.drawImage(barcodeImg, barcodeStartX, barcodeY, barcodeWidth, barcodeHeight);
@@ -612,10 +704,10 @@ async function drawCardManually() {
     } catch (e) {
         console.warn('Barcode loading failed:', e);
         ctx.fillStyle = '#000000';
-        const barcodeY = validY + 32;
-        const barcodeStartX = cardX + 60;
-        const barcodeWidth = 1180;
-        const barcodeHeight = 80;
+        const barcodeY = validY + 50;
+        const barcodeStartX = cardX + 70;
+        const barcodeWidth = 1350;
+        const barcodeHeight = 90;
         const universityNameForBarcode = document.getElementById('university-name').textContent;
         for (let i = 0; i < barcodeWidth; i += 4) {
             const charIndex = Math.floor(i / 24) % universityNameForBarcode.length;
@@ -629,19 +721,19 @@ async function drawCardManually() {
         }
     }
     
-    // Footer elements - match CSS .id-number và .region positioning
-    const footerY = cardY + cardHeight - 40;
+    // Footer elements - enhanced typography and positioning
+    const footerY = cardY + cardHeight - 50;
 
-    // Student ID (bottom left)
+    // Student ID (bottom left) - enhanced font size
     ctx.fillStyle = '#222222';
-    ctx.font = '28px Arial';
+    ctx.font = '32px Segoe UI, Arial';
     ctx.textAlign = 'left';
     const studentId = document.getElementById('student-id').textContent;
-    ctx.fillText(studentId, cardX + 60, footerY);
+    ctx.fillText(studentId, cardX + 70, footerY);
 
-    // United States (bottom right)
+    // United States (bottom right) - enhanced font size
     ctx.textAlign = 'right';
-    ctx.fillText('United States', cardX + cardWidth - 60, footerY);
+    ctx.fillText('🇺🇸 United States', cardX + cardWidth - 70, footerY);
     
     // Download the canvas
     canvas.toBlob((blob) => {

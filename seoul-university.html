@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seoul National University - Student Card Generator</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #003366 0%, #0066cc 100%);
+            font-family: 'Noto Sans KR', Arial, sans-serif;
+            min-height: 100vh;
+        }
+        
+        .header {
+            text-align: center;
+            padding: 20px 0;
+            color: white;
+            position: relative;
+        }
+        
+        .home-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #003366;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        
+        .home-button:hover {
+            background: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin: 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .header h2 {
+            font-size: 1.5rem;
+            margin: 5px 0 0 0;
+            opacity: 0.9;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .main-content {
+            display: flex;
+            gap: 30px;
+            margin-top: 20px;
+        }
+        
+        .controls {
+            background: rgba(255,255,255,0.95);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            flex: 1;
+            backdrop-filter: blur(10px);
+        }
+        
+        .card-display {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+        
+        .controls h3 {
+            color: #003366;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #003366;
+            padding-bottom: 10px;
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .btn-generate {
+            background: linear-gradient(45deg, #003366, #0066cc);
+            color: white;
+        }
+        
+        .btn-generate:hover {
+            background: linear-gradient(45deg, #002244, #0055aa);
+            transform: translateY(-2px);
+        }
+        
+        .btn-download {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            color: white;
+        }
+        
+        .btn-download:hover {
+            background: linear-gradient(45deg, #218838, #1aa179);
+            transform: translateY(-2px);
+        }
+        
+        .btn-verify {
+            background: linear-gradient(45deg, #dc3545, #fd7e14);
+            color: white;
+        }
+        
+        .btn-verify:hover {
+            background: linear-gradient(45deg, #c82333, #e8650e);
+            transform: translateY(-2px);
+        }
+        
+        .card {
+            width: 540px;
+            height: 340px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.3s ease;
+        }
+        
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url('https://upload.wikimedia.org/wikipedia/en/thumb/7/77/Seoul_national_university_emblem.svg/1200px-Seoul_national_university_emblem.svg.png');
+            background-size: 60%;
+            background-repeat: no-repeat;
+            background-position: center;
+            opacity: 0.05;
+            z-index: 1;
+            pointer-events: none;
+        }
+        
+        .card:hover {
+            transform: rotateY(2deg) rotateX(2deg);
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, #003366 0%, #0066cc 100%);
+            height: 90px;
+            display: flex;
+            align-items: center;
+            padding: 0 25px;
+            color: white;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .university-logo {
+            width: 70px;
+            height: 70px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 18px;
+            overflow: hidden;
+        }
+        
+        .university-logo img {
+            width: 60px;
+            height: 60px;
+            object-fit: contain;
+        }
+        
+        .university-info h4 {
+            margin: 0;
+            font-size: 1.3rem;
+            font-weight: bold;
+        }
+        
+        .university-info p {
+            margin: 8px 0 0 0;
+            font-size: 0.8rem;
+            opacity: 0.9;
+        }
+        
+        .card-body {
+            padding: 25px;
+            display: flex;
+            gap: 25px;
+            height: calc(100% - 90px);
+            position: relative;
+            z-index: 2;
+        }
+        
+        .student-photo {
+            width: 100px;
+            height: 125px;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 3px solid #003366;
+            flex-shrink: 0;
+        }
+        
+        .student-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .student-info {
+            flex: 1;
+            font-size: 0.95rem;
+            line-height: 1.8;
+        }
+        
+        .student-info div {
+            margin-bottom: 10px;
+            display: flex;
+        }
+        
+        .student-info .label {
+            font-weight: bold;
+            color: #003366;
+            min-width: 110px;
+            font-size: 0.9rem;
+        }
+        
+        .student-info .value {
+            color: #333;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+        
+        .card-footer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #003366;
+            color: white;
+            text-align: center;
+            padding: 8px;
+            font-size: 0.8rem;
+            z-index: 2;
+        }
+        
+        .loading-spinner {
+            display: inline-block;
+            width: 15px;
+            height: 15px;
+            border: 2px solid #ffffff;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 8px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 10px;
+            color: white;
+            font-weight: bold;
+            max-width: 350px;
+            z-index: 1000;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification.success {
+            background: linear-gradient(45deg, #28a745, #20c997);
+        }
+        
+        .notification.error {
+            background: linear-gradient(45deg, #dc3545, #fd7e14);
+        }
+        
+        .notification.info {
+            background: linear-gradient(45deg, #17a2b8, #6f42c1);
+        }
+        
+        #photo-selection {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+        }
+        
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a href="http://localhost:3000/index.html" class="home-button">🏠 Về trang chủ</a>
+        <h1>서울대학교</h1>
+        <h2>Seoul National University</h2>
+        <p>Máy tạo thẻ sinh viên trực tuyến</p>
+    </div>
+    
+    <div class="container">
+        <div class="main-content">
+            <div class="controls">
+                <h3>🇰🇷 Tạo thẻ sinh viên Seoul National University</h3>
+                
+                <div class="btn-group">
+                    <button class="btn btn-generate" onclick="generateStudentCard()">
+                        <span class="btn-text">Tạo thẻ mới</span>
+                    </button>
+                    <button class="btn btn-download" onclick="downloadCard()" disabled>
+                        Tải xuống
+                    </button>
+                    <button class="btn btn-verify" onclick="startStudentVerification()">
+                        Xác minh sinh viên
+                    </button>
+                </div>
+                
+                <div style="margin-top: 30px;">
+                    <h4 style="color: #003366; margin-bottom: 15px;">📋 Thông tin tự động tạo</h4>
+                    <ul style="color: #666; line-height: 1.8; padding-left: 20px;">
+                        <li><strong>Tên Hàn Quốc:</strong> Họ và tên thật của người Hàn</li>
+                        <li><strong>Khoa học:</strong> Các khoa thực tế của Seoul National University</li>
+                        <li><strong>Mã sinh viên:</strong> Định dạng năm 2024</li>
+                        <li><strong>Số điện thoại:</strong> Định dạng số di động Hàn Quốc</li>
+                        <li><strong>Năm học:</strong> Từ năm 1 đến năm 4</li>
+                        <li><strong>Ảnh đại diện:</strong> AI tạo ảnh người châu Á</li>
+                    </ul>
+                </div>
+                
+                <div style="margin-top: 30px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+                    <h4 style="color: #003366; margin-bottom: 10px;">ℹ️ Hướng dẫn sử dụng</h4>
+                    <p style="color: #666; font-size: 0.9rem; line-height: 1.6; margin: 0;">
+                        Công cụ này được tạo cho mục đích giáo dục và trình diễn. 
+                        Thẻ sinh viên được tạo không liên quan đến Seoul National University thật, 
+                        và không được sử dụng cho mục đích bất hợp pháp.
+                    </p>
+                </div>
+            </div>
+            
+            <div class="card-display">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="university-logo" id="university-logo">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/9/9e/Seoul_national_university_logotype.svg" alt="SNU Logo">
+                        </div>
+                        <div class="university-info">
+                            <h4 id="university-name">Seoul National University</h4>
+                            <p>Republic of Korea</p>
+                        </div>
+                    </div>
+                    
+                    <div class="card-body">
+                        <div class="student-photo" id="student-photo">
+                            <img src="logous.png" alt="Student Photo">
+                        </div>
+                        
+                        <div class="student-info">
+                            <div>
+                                <span class="label">Name:</span>
+                                <span class="value" id="student-name">김민준</span>
+                            </div>
+                            <div>
+                                <span class="label">Date of Birth:</span>
+                                <span class="value" id="student-dob">2002-03-15</span>
+                            </div>
+                            <div>
+                                <span class="label">Student ID:</span>
+                                <span class="value" id="student-id">2024123456</span>
+                            </div>
+                            <div>
+                                <span class="label">Department:</span>
+                                <span class="value" id="student-department">컴퓨터공학부</span>
+                            </div>
+                            <div>
+                                <span class="label">Class:</span>
+                                <span class="value" id="student-class">컴퓨터공학부 2학년</span>
+                            </div>
+                            <div>
+                                <span class="label">Course:</span>
+                                <span class="value" id="student-course">2024 - 2028</span>
+                            </div>
+                            <div>
+                                <span class="label">Valid until:</span>
+                                <span class="value" id="valid-until">31/07/2029</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card-footer">
+                        <img id="barcode" src="" alt="Barcode" style="height: 20px; opacity: 0.8;">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="seoul-university-card.js"></script>
+</body>
+</html>

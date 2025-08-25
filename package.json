@@ -1,15 +1,26 @@
 {
-  "name": "student-card-generator",
-  "version": "1.0.0",
-  "description": "Student Card Generator với ảnh AI từ thispersonnotexist.org",
+  "name": "global-student-card-generator",
+  "version": "2.0.0",
+  "description": "🎓 A professional, AI-powered student ID card generator supporting multiple universities worldwide with realistic data and photos",
   "main": "proxy-server.js",
+  "homepage": "https://github.com/hungvu25/student-card-generator#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hungvu25/student-card-generator.git"
+  },
+  "bugs": {
+    "url": "https://github.com/hungvu25/student-card-generator/issues"
+  },
   "scripts": {
     "start": "node proxy-server.js",
-    "dev": "nodemon proxy-server.js"
+    "dev": "nodemon proxy-server.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "echo \"No build step required for this project\"",
+    "deploy": "echo \"Deploy script not configured\""
   },
   "dependencies": {
     "cors": "^2.8.5",
-    "express": "^4.18.2",
+    "express": "^4.21.2",
     "jsdom": "^26.1.0",
     "node-fetch": "^2.7.0"
   },
@@ -18,13 +29,39 @@
   },
   "keywords": [
     "student-card",
+    "id-card",
     "generator",
-    "ai",
-    "thispersonnotexist"
+    "ai-photos",
+    "university",
+    "mahe",
+    "santa-fe-college",
+    "seoul-university",
+    "thispersonnotexist",
+    "canvas",
+    "barcode",
+    "education",
+    "professional",
+    "multi-region",
+    "responsive-design"
   ],
-  "author": "Your Name",
+  "author": {
+    "name": "Hung Vu",
+    "email": "vhung9955@gmail.com",
+    "url": "https://github.com/hungvu25"
+  },
+  "contributors": [],
   "license": "MIT",
   "engines": {
-    "node": ">=16.0.0"
-  }
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "os": [
+    "darwin",
+    "linux",
+    "win32"
+  ],
+  "cpu": [
+    "x64",
+    "arm64"
+  ]
 }
