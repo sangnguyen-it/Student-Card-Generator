@@ -411,54 +411,70 @@ async function drawCardManually() {
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(cardX, cardY, cardWidth, cardHeight);
     
-    // Add watermark background
-    try {
-        const watermarkImg = new Image();
-        watermarkImg.crossOrigin = 'anonymous';
-        
-        await new Promise((resolve) => {
-            watermarkImg.onload = () => {
-                console.log('Santa Fe College watermark loaded successfully');
-                resolve();
-            };
-            watermarkImg.onerror = (e) => {
-                console.warn('Santa Fe College watermark failed to load:', e);
-                resolve();
-            };
-            watermarkImg.src = 'https://www.sfcollege.edu/_media/news/000-seal.png';
-            setTimeout(() => {
-                console.log('Santa Fe College watermark timeout reached');
-                resolve();
-            }, 5000);
-        });
-        
-        if (watermarkImg.complete && watermarkImg.naturalWidth > 0) {
-            console.log('Drawing Santa Fe College seal as watermark to canvas');
-            ctx.save();
-            ctx.globalAlpha = 0.15; // Slightly more visible for official seal
+    // Add watermark background (only if checkbox is checked)
+    const watermarkCheckbox = document.getElementById('watermark-checkbox');
+    const showWatermark = watermarkCheckbox ? watermarkCheckbox.checked : true; // Default to true if checkbox not found
+    
+    if (showWatermark) {
+        try {
+            const watermarkImg = new Image();
+            watermarkImg.crossOrigin = 'anonymous';
             
-            // Calculate proper aspect ratio for watermark
-            const maxWatermarkSize = 900; // Tăng từ 380 lên 500 để watermark to hơn
-            const aspectRatio = watermarkImg.naturalWidth / watermarkImg.naturalHeight;
-            let watermarkWidth, watermarkHeight;
+            await new Promise((resolve) => {
+                watermarkImg.onload = () => {
+                    console.log('Santa Fe College watermark loaded successfully');
+                    resolve();
+                };
+                watermarkImg.onerror = (e) => {
+                    console.warn('Santa Fe College watermark failed to load:', e);
+                    resolve();
+                };
+                watermarkImg.src = 'https://www.sfcollege.edu/_media/news/000-seal.png';
+                setTimeout(() => {
+                    console.log('Santa Fe College watermark timeout reached');
+                    resolve();
+                }, 5000);
+            });
             
-            if (aspectRatio > 1) {
-                // Landscape: width is larger
-                watermarkWidth = maxWatermarkSize;
-                watermarkHeight = maxWatermarkSize / aspectRatio;
+            if (watermarkImg.complete && watermarkImg.naturalWidth > 0) {
+                console.log('Drawing Santa Fe College seal as watermark to canvas');
+                ctx.save();
+                ctx.globalAlpha = 0.15; // Slightly more visible for official seal
+                
+                // Calculate proper aspect ratio for watermark
+                const maxWatermarkSize = 900; // Tăng từ 380 lên 500 để watermark to hơn
+                const aspectRatio = watermarkImg.naturalWidth / watermarkImg.naturalHeight;
+                let watermarkWidth, watermarkHeight;
+                
+                if (aspectRatio > 1) {
+                    // Landscape: width is larger
+                    watermarkWidth = maxWatermarkSize;
+                    watermarkHeight = maxWatermarkSize / aspectRatio;
+                } else {
+                    // Portrait or square: height is larger or equal
+                    watermarkHeight = maxWatermarkSize;
+                    watermarkWidth = maxWatermarkSize * aspectRatio;
+                }
+                
+                const watermarkX = (cardWidth - watermarkWidth) / 2;
+                const watermarkY = (cardHeight - watermarkHeight) / 2;
+                ctx.drawImage(watermarkImg, watermarkX, watermarkY, watermarkWidth, watermarkHeight);
+                ctx.restore();
             } else {
-                // Portrait or square: height is larger or equal
-                watermarkHeight = maxWatermarkSize;
-                watermarkWidth = maxWatermarkSize * aspectRatio;
+                console.warn('Santa Fe College watermark not ready, drawing fallback');
+                // Fallback watermark using text
+                ctx.save();
+                ctx.globalAlpha = 0.15;
+                ctx.font = 'bold 48px Arial';
+                ctx.fillStyle = '#1e3a8a';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('SANTA FE COLLEGE', cardWidth / 2, cardHeight / 2);
+                ctx.restore();
             }
-            
-            const watermarkX = (cardWidth - watermarkWidth) / 2;
-            const watermarkY = (cardHeight - watermarkHeight) / 2;
-            ctx.drawImage(watermarkImg, watermarkX, watermarkY, watermarkWidth, watermarkHeight);
-            ctx.restore();
-        } else {
-            console.warn('Santa Fe College watermark not ready, drawing fallback');
-            // Fallback watermark using text
+        } catch (e) {
+            console.warn('Watermark loading failed, using fallback:', e);
+            // Fallback watermark using Santa Fe College name
             ctx.save();
             ctx.globalAlpha = 0.15;
             ctx.font = 'bold 48px Arial';
@@ -468,17 +484,8 @@ async function drawCardManually() {
             ctx.fillText('SANTA FE COLLEGE', cardWidth / 2, cardHeight / 2);
             ctx.restore();
         }
-    } catch (e) {
-        console.warn('Watermark loading failed, using fallback:', e);
-        // Fallback watermark using Santa Fe College name
-        ctx.save();
-        ctx.globalAlpha = 0.15;
-        ctx.font = 'bold 48px Arial';
-        ctx.fillStyle = '#1e3a8a';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText('SANTA FE COLLEGE', cardWidth / 2, cardHeight / 2);
-        ctx.restore();
+    } else {
+        console.log('Watermark disabled by user - skipping watermark rendering');
     }
     
     // Card border with rounded corners

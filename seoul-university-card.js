@@ -407,31 +407,38 @@ async function drawCardManually() {
     ctx.fillStyle = gradient;
     ctx.fillRect(cardX, cardY, cardWidth, cardHeight);
     
-    // Thêm watermark SNU emblem
-    try {
-        const watermarkImg = new Image();
-        watermarkImg.crossOrigin = 'anonymous';
-        await new Promise((resolve) => {
-            watermarkImg.onload = resolve;
-            watermarkImg.onerror = resolve;
-            watermarkImg.src = 'https://upload.wikimedia.org/wikipedia/en/thumb/7/77/Seoul_national_university_emblem.svg/1200px-Seoul_national_university_emblem.svg.png';
-            setTimeout(resolve, 4000);
-        });
-        
-        if (watermarkImg.complete && watermarkImg.naturalWidth > 0) {
-            // Vẽ watermark ở giữa thẻ với độ mờ
-            ctx.save();
-            ctx.globalAlpha = 0.08; // Độ mờ 8%
+    // Thêm watermark SNU emblem (only if checkbox is checked)
+    const watermarkCheckbox = document.getElementById('watermark-checkbox');
+    const showWatermark = watermarkCheckbox ? watermarkCheckbox.checked : true; // Default to true if checkbox not found
+    
+    if (showWatermark) {
+        try {
+            const watermarkImg = new Image();
+            watermarkImg.crossOrigin = 'anonymous';
+            await new Promise((resolve) => {
+                watermarkImg.onload = resolve;
+                watermarkImg.onerror = resolve;
+                watermarkImg.src = 'https://upload.wikimedia.org/wikipedia/en/thumb/7/77/Seoul_national_university_emblem.svg/1200px-Seoul_national_university_emblem.svg.png';
+                setTimeout(resolve, 4000);
+            });
             
-            const watermarkSize = Math.min(cardWidth, cardHeight) * 0.6; // 60% kích thước thẻ
-            const watermarkX = cardX + (cardWidth - watermarkSize) / 2;
-            const watermarkY = cardY + (cardHeight - watermarkSize) / 2;
-            
-            ctx.drawImage(watermarkImg, watermarkX, watermarkY, watermarkSize, watermarkSize);
-            ctx.restore(); // Khôi phục globalAlpha
+            if (watermarkImg.complete && watermarkImg.naturalWidth > 0) {
+                // Vẽ watermark ở giữa thẻ với độ mờ
+                ctx.save();
+                ctx.globalAlpha = 0.08; // Độ mờ 8%
+                
+                const watermarkSize = Math.min(cardWidth, cardHeight) * 0.6; // 60% kích thước thẻ
+                const watermarkX = cardX + (cardWidth - watermarkSize) / 2;
+                const watermarkY = cardY + (cardHeight - watermarkSize) / 2;
+                
+                ctx.drawImage(watermarkImg, watermarkX, watermarkY, watermarkSize, watermarkSize);
+                ctx.restore(); // Khôi phục globalAlpha
+            }
+        } catch (e) {
+            console.warn('Watermark loading failed:', e);
         }
-    } catch (e) {
-        console.warn('Watermark loading failed:', e);
+    } else {
+        console.log('Watermark disabled by user - skipping watermark rendering');
     }
     
     // Card border với shadow effect

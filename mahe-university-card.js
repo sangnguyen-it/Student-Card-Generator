@@ -403,64 +403,81 @@ async function drawCardManually() {
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(cardX, cardY, cardWidth, cardHeight);
     
-    // Add watermark background
-    try {
-        const watermarkImg = new Image();
-        // Try to use the university's own logo as watermark first
-        let watermarkSrc = document.getElementById('university-logo').src;
-        if (watermarkSrc.includes('logo-mahe.png')) {
-            watermarkSrc = 'logo-mahe.png';
-        }
-        
-        if (!watermarkSrc.startsWith('http')) {
-            watermarkImg.crossOrigin = null;
-        } else {
-            watermarkImg.crossOrigin = 'anonymous';
-        }
-        
-        await new Promise((resolve) => {
-            watermarkImg.onload = () => {
-                console.log('MAHE Watermark (university logo) loaded successfully');
-                resolve();
-            };
-            watermarkImg.onerror = (e) => {
-                console.warn('MAHE Watermark (university logo) failed to load:', e);
-                resolve();
-            };
-            watermarkImg.src = watermarkSrc;
-            setTimeout(() => {
-                console.log('MAHE Watermark timeout reached');
-                resolve();
-            }, 3000);
-        });
-        
-        if (watermarkImg.complete && watermarkImg.naturalWidth > 0) {
-            console.log('Drawing MAHE university logo as watermark to canvas');
-            ctx.save();
-            ctx.globalAlpha = 0.15; // More subtle for logo
-            
-            // Calculate proper aspect ratio for watermark
-            const maxWatermarkSize = 900; // Tăng từ 400 lên 520 để watermark to hơn
-            const aspectRatio = watermarkImg.naturalWidth / watermarkImg.naturalHeight;
-            let watermarkWidth, watermarkHeight;
-            
-            if (aspectRatio > 1) {
-                // Landscape: width is larger
-                watermarkWidth = maxWatermarkSize;
-                watermarkHeight = maxWatermarkSize / aspectRatio;
-            } else {
-                // Portrait or square: height is larger or equal
-                watermarkHeight = maxWatermarkSize;
-                watermarkWidth = maxWatermarkSize * aspectRatio;
+    // Add watermark background (only if checkbox is checked)
+    const watermarkCheckbox = document.getElementById('watermark-checkbox');
+    const showWatermark = watermarkCheckbox ? watermarkCheckbox.checked : true; // Default to true if checkbox not found
+    
+    if (showWatermark) {
+        try {
+            const watermarkImg = new Image();
+            // Try to use the university's own logo as watermark first
+            let watermarkSrc = document.getElementById('university-logo').src;
+            if (watermarkSrc.includes('logo-mahe.png')) {
+                watermarkSrc = 'logo-mahe.png';
             }
             
-            const watermarkX = (cardWidth - watermarkWidth) / 2;
-            const watermarkY = (cardHeight - watermarkHeight) / 2;
-            ctx.drawImage(watermarkImg, watermarkX, watermarkY, watermarkWidth, watermarkHeight);
-            ctx.restore();
-        } else {
-            console.warn('MAHE Watermark not ready, drawing fallback');
-            // Fallback watermark using text
+            if (!watermarkSrc.startsWith('http')) {
+                watermarkImg.crossOrigin = null;
+            } else {
+                watermarkImg.crossOrigin = 'anonymous';
+            }
+            
+            await new Promise((resolve) => {
+                watermarkImg.onload = () => {
+                    console.log('MAHE Watermark (university logo) loaded successfully');
+                    resolve();
+                };
+                watermarkImg.onerror = (e) => {
+                    console.warn('MAHE Watermark (university logo) failed to load:', e);
+                    resolve();
+                };
+                watermarkImg.src = watermarkSrc;
+                setTimeout(() => {
+                    console.log('MAHE Watermark timeout reached');
+                    resolve();
+                }, 3000);
+            });
+            
+            if (watermarkImg.complete && watermarkImg.naturalWidth > 0) {
+                console.log('Drawing MAHE university logo as watermark to canvas');
+                ctx.save();
+                ctx.globalAlpha = 0.15; // More subtle for logo
+                
+                // Calculate proper aspect ratio for watermark
+                const maxWatermarkSize = 900; // Tăng từ 400 lên 520 để watermark to hơn
+                const aspectRatio = watermarkImg.naturalWidth / watermarkImg.naturalHeight;
+                let watermarkWidth, watermarkHeight;
+                
+                if (aspectRatio > 1) {
+                    // Landscape: width is larger
+                    watermarkWidth = maxWatermarkSize;
+                    watermarkHeight = maxWatermarkSize / aspectRatio;
+                } else {
+                    // Portrait or square: height is larger or equal
+                    watermarkHeight = maxWatermarkSize;
+                    watermarkWidth = maxWatermarkSize * aspectRatio;
+                }
+                
+                const watermarkX = (cardWidth - watermarkWidth) / 2;
+                const watermarkY = (cardHeight - watermarkHeight) / 2;
+                ctx.drawImage(watermarkImg, watermarkX, watermarkY, watermarkWidth, watermarkHeight);
+                ctx.restore();
+            } else {
+                console.warn('MAHE Watermark not ready, drawing fallback');
+                // Fallback watermark using text
+                ctx.save();
+                ctx.globalAlpha = 0.15;
+                ctx.font = 'bold 48px Arial';
+                ctx.fillStyle = '#ff6600';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                const universityName = document.getElementById('university-name').textContent;
+                ctx.fillText(universityName.toUpperCase(), cardWidth / 2, cardHeight / 2);
+                ctx.restore();
+            }
+        } catch (e) {
+            console.warn('Watermark loading failed, using fallback:', e);
+            // Fallback watermark using university name
             ctx.save();
             ctx.globalAlpha = 0.15;
             ctx.font = 'bold 48px Arial';
@@ -471,18 +488,8 @@ async function drawCardManually() {
             ctx.fillText(universityName.toUpperCase(), cardWidth / 2, cardHeight / 2);
             ctx.restore();
         }
-    } catch (e) {
-        console.warn('Watermark loading failed, using fallback:', e);
-        // Fallback watermark using university name
-        ctx.save();
-        ctx.globalAlpha = 0.15;
-        ctx.font = 'bold 48px Arial';
-        ctx.fillStyle = '#ff6600';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        const universityName = document.getElementById('university-name').textContent;
-        ctx.fillText(universityName.toUpperCase(), cardWidth / 2, cardHeight / 2);
-        ctx.restore();
+    } else {
+        console.log('Watermark disabled by user - skipping watermark rendering');
     }
     
     // Card border with rounded corners

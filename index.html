@@ -5,6 +5,86 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Card Generator - Choose Region</title>
     <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Responsive layout for university cards */
+        .university-cards-container {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            flex-wrap: nowrap;
+            margin-top: 50px;
+            padding: 0 20px;
+        }
+        
+        .university-card {
+            flex: 1;
+            max-width: 300px;
+            min-height: 280px;
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            color: white;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            transition: transform 0.3s ease;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        
+        .university-card:hover {
+            transform: translateY(-10px);
+        }
+        
+        .university-logo {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 15px auto;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        
+        .university-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+        
+        /* Mobile responsive */
+        @media (max-width: 768px) {
+            .university-cards-container {
+                flex-direction: column;
+                align-items: center;
+                gap: 20px;
+                padding: 0 10px;
+            }
+            
+            .university-card {
+                max-width: 100%;
+                width: 100%;
+                max-width: 400px;
+            }
+        }
+        
+        /* Tablet responsive */
+        @media (max-width: 1024px) and (min-width: 769px) {
+            .university-cards-container {
+                gap: 20px;
+                padding: 0 15px;
+            }
+            
+            .university-card {
+                max-width: 280px;
+                padding: 25px;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -13,17 +93,20 @@
             <p class="subtitle">Create professional student ID cards worldwide</p>
         </div>
         
-        <div style="display: flex; gap: 40px; justify-content: center; flex-wrap: wrap; margin-top: 50px;">
+        <div class="university-cards-container">
             <!-- Indian Universities Card -->
-            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 20px; padding: 40px; text-align: center; color: white; box-shadow: 0 10px 30px rgba(0,0,0,0.3); transition: transform 0.3s ease; cursor: pointer; max-width: 350px; min-height: 300px; display: flex; flex-direction: column; justify-content: space-between;" onclick="location.href='/mahe-university.html'" onmouseover="this.style.transform='translateY(-10px)'" onmouseout="this.style.transform='translateY(0)'">
+            <div class="university-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);" onclick="location.href='/mahe-university.html'">
                 <div>
-                    <div style="font-size: 4rem; margin-bottom: 20px;">🇮🇳</div>
-                    <h2 style="font-size: 2rem; margin-bottom: 15px; font-weight: bold;">MAHE University</h2>
-                    <p style="font-size: 1.1rem; line-height: 1.6; opacity: 0.9;">Generate student cards for Manipal Academy of Higher Education (MAHE) with Indian names and realistic data.</p>
+                    <div class="university-logo">
+                        <img src="logo-mahe.png" alt="MAHE University Logo">
+                    </div>
+                    <div style="font-size: 2.5rem; margin-bottom: 15px;">🇮🇳</div>
+                    <h2 style="font-size: 1.8rem; margin-bottom: 12px; font-weight: bold;">MAHE University</h2>
+                    <p style="font-size: 1rem; line-height: 1.5; opacity: 0.9;">Generate student cards for Manipal Academy of Higher Education (MAHE) with Indian names and realistic data.</p>
                 </div>
-                <div style="margin-top: 30px;">
-                    <div style="font-size: 0.9rem; opacity: 0.8; margin-bottom: 10px;">Features:</div>
-                    <div style="font-size: 0.85rem; opacity: 0.9;">
+                <div style="margin-top: 20px;">
+                    <div style="font-size: 0.85rem; opacity: 0.8; margin-bottom: 8px;">Features:</div>
+                    <div style="font-size: 0.8rem; opacity: 0.9;">
                         ✨ MAHE Branding<br>
                         👥 Indian Names<br>
                         🏫 16 Departments<br>
@@ -33,15 +116,18 @@
             </div>
 
             <!-- US Universities Card -->
-            <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border-radius: 20px; padding: 40px; text-align: center; color: white; box-shadow: 0 10px 30px rgba(0,0,0,0.3); transition: transform 0.3s ease; cursor: pointer; max-width: 350px; min-height: 300px; display: flex; flex-direction: column; justify-content: space-between;" onclick="location.href='/us-university.html'" onmouseover="this.style.transform='translateY(-10px)'" onmouseout="this.style.transform='translateY(0)'">
+            <div class="university-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);" onclick="location.href='/us-university.html'">
                 <div>
-                    <div style="font-size: 4rem; margin-bottom: 20px;">🇺🇸</div>
-                    <h2 style="font-size: 2rem; margin-bottom: 15px; font-weight: bold;">US Universities</h2>
-                    <p style="font-size: 1.1rem; line-height: 1.6; opacity: 0.9;">Generate student cards for prestigious US institutions like Harvard, MIT, Stanford, and more.</p>
+                    <div class="university-logo">
+                        <img src="logous.png" alt="Santa Fe College Logo">
+                    </div>
+                    <div style="font-size: 2.5rem; margin-bottom: 15px;">🇺🇸</div>
+                    <h2 style="font-size: 1.8rem; margin-bottom: 12px; font-weight: bold;">US Universities</h2>
+                    <p style="font-size: 1rem; line-height: 1.5; opacity: 0.9;">Generate student cards for prestigious US institutions like Harvard, MIT, Stanford, and more.</p>
                 </div>
-                <div style="margin-top: 30px;">
-                    <div style="font-size: 0.9rem; opacity: 0.8; margin-bottom: 10px;">Features:</div>
-                    <div style="font-size: 0.85rem; opacity: 0.9;">
+                <div style="margin-top: 20px;">
+                    <div style="font-size: 0.85rem; opacity: 0.8; margin-bottom: 8px;">Features:</div>
+                    <div style="font-size: 0.8rem; opacity: 0.9;">
                         ✨ 15+ Universities<br>
                         👥 50+ American Names<br>
                         🏫 15 Schools<br>
@@ -51,15 +137,18 @@
             </div>
 
             <!-- Seoul National University Card -->
-            <div style="background: linear-gradient(135deg, #003366 0%, #0066cc 100%); border-radius: 20px; padding: 40px; text-align: center; color: white; box-shadow: 0 10px 30px rgba(0,0,0,0.3); transition: transform 0.3s ease; cursor: pointer; max-width: 350px; min-height: 300px; display: flex; flex-direction: column; justify-content: space-between;" onclick="location.href='/seoul-university.html'" onmouseover="this.style.transform='translateY(-10px)'" onmouseout="this.style.transform='translateY(0)'">
+            <div class="university-card" style="background: linear-gradient(135deg, #003366 0%, #0066cc 100%);" onclick="location.href='/seoul-university.html'">
                 <div>
-                    <div style="font-size: 4rem; margin-bottom: 20px;">🇰🇷</div>
-                    <h2 style="font-size: 2rem; margin-bottom: 15px; font-weight: bold;">Seoul National University</h2>
-                    <p style="font-size: 1.1rem; line-height: 1.6; opacity: 0.9;">Generate student cards for Seoul National University (서울대학교) with authentic Korean names and departments.</p>
+                    <div class="university-logo">
+                        <img src="https://upload.wikimedia.org/wikipedia/en/thumb/7/77/Seoul_national_university_emblem.svg/200px-Seoul_national_university_emblem.svg.png" alt="Seoul National University Logo" onerror="this.style.display='none'; this.parentElement.innerHTML='🏛️';">
+                    </div>
+                    <div style="font-size: 2.5rem; margin-bottom: 15px;">🇰🇷</div>
+                    <h2 style="font-size: 1.8rem; margin-bottom: 12px; font-weight: bold;">Seoul National University</h2>
+                    <p style="font-size: 1rem; line-height: 1.5; opacity: 0.9;">Generate student cards for Seoul National University (서울대학교) with authentic Korean names and departments.</p>
                 </div>
-                <div style="margin-top: 30px;">
-                    <div style="font-size: 0.9rem; opacity: 0.8; margin-bottom: 10px;">Features:</div>
-                    <div style="font-size: 0.85rem; opacity: 0.9;">
+                <div style="margin-top: 20px;">
+                    <div style="font-size: 0.85rem; opacity: 0.8; margin-bottom: 8px;">Features:</div>
+                    <div style="font-size: 0.8rem; opacity: 0.9;">
                         ✨ SNU Official Branding<br>
                         👥 Korean Names<br>
                         🏫 35+ Departments<br>
