@@ -142,18 +142,8 @@ function showPhotoSelection(photoList, selectedIndex = 0) {
     if (!container) {
         container = document.createElement('div');
         container.id = 'photo-selection';
-        container.style.cssText = `
-            position: fixed;
-            top: 120px;
-            left: 20px;
-            background: rgba(255,255,255,0.95);
-            padding: 15px;
-            border-radius: 12px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
-            backdrop-filter: blur(10px);
-            z-index: 1000;
-            max-width: 320px;
-        `;
+    // Let CSS handle layout; insert after preview card so it appears beneath the card
+    container.style.maxWidth = '100%';
         
         // Thêm title và close button
         const header = document.createElement('div');
@@ -205,7 +195,20 @@ function showPhotoSelection(photoList, selectedIndex = 0) {
         `;
         container.appendChild(gridContainer);
         
-        document.body.appendChild(container);
+        // Insert the photo-selection container into the card-container so it appears below the card
+        const cardContainer = document.querySelector('.card-container');
+        if (cardContainer) {
+            cardContainer.appendChild(container);
+        } else {
+            // fallback to after card element if .card-container not found
+            const card = document.querySelector('.card');
+            if (card && card.parentNode) {
+                card.insertAdjacentElement('afterend', container);
+            } else {
+                // final fallback to body
+                document.body.appendChild(container);
+            }
+        }
     } else {
         container.style.display = 'block';
     }

@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MAHE University - Student Card Generator</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Santa Fe College - Student Card Generator</title>
+    <link rel="stylesheet" href="../css/styles.css">
     <style>
         body {
-            background: linear-gradient(135deg, #1e40af 0%, #6366f1 100%);
+            background: linear-gradient(135deg, #059669 0%, #0891b2 100%);
             font-family: 'Arial', sans-serif;
             min-height: 100vh;
         }
@@ -24,7 +24,7 @@
             top: 20px;
             left: 20px;
             background: rgba(255, 255, 255, 0.9);
-            color: #1e40af;
+            color: #059669;
             padding: 10px 20px;
             border: none;
             border-radius: 25px;
@@ -81,9 +81,9 @@
         }
         
         .controls h3 {
-            color: #1e40af;
+            color: #059669;
             margin-bottom: 20px;
-            border-bottom: 2px solid #1e40af;
+            border-bottom: 2px solid #059669;
             padding-bottom: 10px;
         }
         
@@ -106,12 +106,12 @@
         }
         
         .btn-generate {
-            background: linear-gradient(45deg, #1e40af, #6366f1);
+            background: linear-gradient(45deg, #059669, #0891b2);
             color: white;
         }
         
         .btn-generate:hover {
-            background: linear-gradient(45deg, #1d4ed8, #4f46e5);
+            background: linear-gradient(45deg, #047857, #0e7490);
             transform: translateY(-2px);
         }
         
@@ -136,8 +136,12 @@
         }
         
         .card {
-            width: 540px;
-            height: 340px;
+            width: 540px !important;
+            height: 340px !important;
+            max-width: 540px;
+            max-height: 340px;
+            min-width: 540px;
+            min-height: 340px;
             background: white;
             border-radius: 20px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
@@ -145,6 +149,9 @@
             position: relative;
             transform-style: preserve-3d;
             transition: transform 0.3s ease;
+            flex-shrink: 0;
+            z-index: 2;
+            margin-bottom: 0;
         }
         
         .card:hover {
@@ -152,7 +159,7 @@
         }
         
         .card-header {
-            background: linear-gradient(135deg, #1e40af 0%, #6366f1 100%);
+            background: linear-gradient(135deg, #059669 0%, #0891b2 100%);
             height: 90px;
             display: flex;
             align-items: center;
@@ -206,7 +213,7 @@
             height: 125px;
             border-radius: 12px;
             overflow: hidden;
-            border: 3px solid #1e40af;
+            border: 3px solid #059669;
             flex-shrink: 0;
         }
         
@@ -229,7 +236,7 @@
         
         .student-info .label {
             font-weight: bold;
-            color: #1e40af;
+            color: #059669;
             min-width: 110px;
             font-size: 0.9rem;
         }
@@ -245,7 +252,7 @@
             bottom: 0;
             left: 0;
             right: 0;
-            background: #1e40af;
+            background: #059669;
             color: white;
             text-align: center;
             padding: 8px;
@@ -298,23 +305,40 @@
             background: linear-gradient(45deg, #17a2b8, #6f42c1);
         }
         
+        /* Photo selection - positioned below the card in horizontal layout */
         #photo-selection {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            margin-top: 10px;
-            padding: 15px;
+            width: 540px;
+            max-width: 540px;
+            margin-top: 20px;
+            padding: 20px;
             background: rgba(255,255,255,0.95);
-            border-radius: 10px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-            z-index: 1000;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
             backdrop-filter: blur(10px);
-            display: none;
+            display: block;
+            position: relative;
+            z-index: 10;
+            clear: both;
         }
         
+        /* legacy class .show remains supported if JS toggles it */
         #photo-selection.show {
             display: block;
+        }
+        
+        /* Donate panel - ensure it doesn't overlap with photo selection */
+        .donate-panel {
+            position: relative !important;
+            z-index: 0 !important;
+            min-height: auto !important;
+            overflow: visible !important;
+        }
+        
+        /* Donate panel image - ensure full display without cropping */
+        .donate-panel img {
+            object-fit: contain !important;
+            height: auto !important;
+            max-height: 200px !important;
         }
         
         .controls {
@@ -332,7 +356,7 @@
         }
         
         .quick-nav h3 {
-            color: #1e40af;
+            color: #059669;
             text-align: center;
             margin: 0 0 15px 0;
             font-size: 1.1rem;
@@ -363,9 +387,6 @@
         .nav-btn.india {
             background: linear-gradient(135deg, #FF6B35 0%, #F7931E 100%);
             color: white;
-            border-color: #e55a2b;
-            transform: scale(1.05);
-            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
         }
         
         .nav-btn.korea {
@@ -376,6 +397,9 @@
         .nav-btn.usa {
             background: linear-gradient(135deg, #059669 0%, #0891b2 100%);
             color: white;
+            border-color: #003d82;
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(5, 150, 105, 0.3);
         }
         
         .nav-btn:hover {
@@ -383,7 +407,7 @@
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
         }
         
-        .nav-btn.india:hover {
+        .nav-btn.usa:hover {
             transform: translateY(-2px) scale(1.1);
         }
         
@@ -400,9 +424,9 @@
 </head>
 <body>
     <div class="header">
-        <a href="index.html" class="home-button">🏠 Về trang chủ</a>
-        <h1>🇮🇳 MAHE University</h1>
-        <h2>Manipal Academy of Higher Education</h2>
+        <a href="../index.html" class="home-button">🏠 Về trang chủ</a>
+        <h1>🇺🇸 Santa Fe College</h1>
+        <h2>United States of America</h2>
         <p>Máy tạo thẻ sinh viên trực tuyến</p>
     </div>
     
@@ -410,13 +434,13 @@
         <h3>🚀 Chuyển đổi nhanh giữa các trường</h3>
         <div class="nav-buttons">
             <a href="mahe-university.html" class="nav-btn india">
-                🇮🇳 Đại học MAHE ✓
+                🇮🇳 Đại học MAHE
             </a>
             <a href="seoul-university.html" class="nav-btn korea">
                 🇰🇷 Seoul National University
             </a>
             <a href="us-university.html" class="nav-btn usa">
-                🇺🇸 Santa Fe College
+                🇺🇸 Santa Fe College ✓
             </a>
         </div>
     </div>
@@ -424,7 +448,7 @@
     <div class="container">
         <div class="main-content">
             <div class="controls">
-                <h3>🇮🇳 Tạo thẻ sinh viên MAHE University</h3>
+                <h3>🇺🇸 Tạo thẻ sinh viên Santa Fe College</h3>
                 
                 <div class="btn-group">
                     <button class="btn btn-generate" onclick="generateStudentCard()">
@@ -439,7 +463,7 @@
                 </div>
                 
                 <div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
-                    <label style="display: flex; align-items: center; gap: 10px; color: #1e40af; font-weight: 500; cursor: pointer;">
+                    <label style="display: flex; align-items: center; gap: 10px; color: #059669; font-weight: 500; cursor: pointer;">
                         <input type="checkbox" id="watermark-checkbox" checked style="transform: scale(1.2);">
                         <span>🏛️ Hiển thị watermark trường đại học</span>
                     </label>
@@ -448,74 +472,86 @@
                     </p>
                 </div>
                 
-                <div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
-                    <h4 style="color: #1e40af; margin-bottom: 10px; font-size: 1.1rem;">📋 Thông tin & Hướng dẫn</h4>
-                    <p style="color: #666; font-size: 0.85rem; line-height: 1.5; margin: 0 0 8px 0;">
-                        <strong>Tự động tạo:</strong> Tên Ấn Độ, khoa MAHE, mã SV 2024, ảnh AI
-                    </p>
-                    <p style="color: #666; font-size: 0.8rem; line-height: 1.4; margin: 0; opacity: 0.8;">
-                        ⚠️ Chỉ dùng cho mục đích giáo dục và trình diễn
+                <div style="margin-top: 30px;">
+                    <h4 style="color: #059669; margin-bottom: 15px;">📋 Thông tin tự động tạo</h4>
+                    <p style="color: #666; line-height: 1.6; margin: 0; font-size: 0.9rem;">
+                        <strong>Tạo tự động:</strong> Tên người Mỹ, khoa học của Santa Fe College, mã sinh viên 2024, số di động Mỹ, năm học 1-4, ảnh AI.<br>
+                        <strong>Mục đích:</strong> Công cụ giáo dục và trình diễn, không liên quan đến trường thật.
                     </p>
                 </div>
             </div>
             
             <div class="card-display">
-                <div class="card">
-                    <div class="card-header">
-                        <div class="university-logo" id="university-logo">
-                            <img src="logo-mahe.png" alt="MAHE Logo">
+                <div style="display:flex; gap:24px; align-items:flex-start; width:100%;">
+                    <div class="card-container" style="flex:0 0 auto; display:flex; flex-direction:column; align-items:center; width:540px; max-width:540px;">
+                        <div class="card" style="width:540px; height:340px; flex-shrink:0;">
+                            <div class="card-header">
+                                <div class="university-logo" id="university-logo">
+                                    <img src="../images/logous.png" alt="US Logo">
+                                </div>
+                                <div class="university-info">
+                                    <h4 id="university-name">Santa Fe College</h4>
+                                    <p>United States of America</p>
+                                </div>
+                            </div>
+
+                            <div class="card-body">
+                                <div class="student-photo" id="student-photo">
+                                    <img id="student-photo-img" src="../images/logous.png" alt="Student Photo">
+                                </div>
+
+                                <div class="student-info">
+                                    <div>
+                                        <span class="label">Name:</span>
+                                        <span class="value" id="student-name">John Smith</span>
+                                    </div>
+                                    <div>
+                                        <span class="label">Date of Birth:</span>
+                                        <span class="value" id="student-dob">2002-05-15</span>
+                                    </div>
+                                    <div>
+                                        <span class="label">Student ID:</span>
+                                        <span class="value" id="student-id">2024123456</span>
+                                    </div>
+                                    <div>
+                                        <span class="label">Department:</span>
+                                        <span class="value" id="student-department">Computer Science</span>
+                                    </div>
+                                    <div>
+                                        <span class="label">Class:</span>
+                                        <span class="value" id="student-class">Computer Science 2nd Year</span>
+                                    </div>
+                                    <div>
+                                        <span class="label">Course:</span>
+                                        <span class="value" id="student-course">2024 - 2028</span>
+                                    </div>
+                                    <div>
+                                        <span class="label">Valid until:</span>
+                                        <span class="value" id="valid-until">31/07/2029</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card-footer">
+                                <img id="barcode" src="" alt="Barcode" style="height: 20px; opacity: 0.8;">
+                            </div>
                         </div>
-                        <div class="university-info">
-                            <h4 id="university-name">MAHE University</h4>
-                            <p>Republic of India</p>
-                        </div>
+                        <!-- Photo selection sẽ được thêm vào đây bởi JavaScript -->
                     </div>
-                    
-                    <div class="card-body">
-                        <div class="student-photo" id="student-photo">
-                            <img id="student-photo-img" src="logo-mahe.png" alt="Student Photo">
-                        </div>
-                        
-                        <div class="student-info">
-                            <div>
-                                <span class="label">Name:</span>
-                                <span class="value" id="student-name">राहुल शर्मा</span>
-                            </div>
-                            <div>
-                                <span class="label">Date of Birth:</span>
-                                <span class="value" id="student-dob">2002-08-15</span>
-                            </div>
-                            <div>
-                                <span class="label">Student ID:</span>
-                                <span class="value" id="student-id">2024123456</span>
-                            </div>
-                            <div>
-                                <span class="label">Department:</span>
-                                <span class="value" id="student-department">Computer Science</span>
-                            </div>
-                            <div>
-                                <span class="label">Class:</span>
-                                <span class="value" id="student-class">Computer Science 2nd Year</span>
-                            </div>
-                            <div>
-                                <span class="label">Course:</span>
-                                <span class="value" id="student-course">2024 - 2028</span>
-                            </div>
-                            <div>
-                                <span class="label">Valid until:</span>
-                                <span class="value" id="valid-until">31/07/2029</span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="card-footer">
-                        <img id="barcode" src="" alt="Barcode" style="height: 20px; opacity: 0.8;">
-                    </div>
+
+                    <aside class="donate-panel" style="flex:0 0 280px; background:#fff; border-radius:12px; padding:16px; box-shadow:0 10px 30px rgba(0,0,0,0.08); position:relative; z-index:0;">
+                        <img src="../images/donate.jpg" alt="Donate" style="width:100%; height:auto; max-height:200px; object-fit:contain; border-radius:8px; border:2px solid #f7f7fb; margin-bottom:12px;">
+                        <div style="font-weight:700; color:#059669; margin-bottom:8px;">🙏 Hỗ trợ dự án</div>
+                        <div style="color:#444; font-size:0.95rem; line-height:1.3;">😁😁 cảm ơn mọi người đã tin tưởng và sử dụng nếu ổn áp em không ngại nhận lì xì đâu 😘😘😘😘</div>
+                    </aside>
                 </div>
             </div>
         </div>
     </div>
+    </div>
+
     
-    <script src="mahe-university-card.js"></script>
+
+    <script src="../js/us-university-card.js"></script>
 </body>
 </html>
