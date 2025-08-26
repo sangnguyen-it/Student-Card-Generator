@@ -514,22 +514,39 @@ async function drawCardManually() {
     // Load and draw university logo (enlarged to 400px)
     try {
         const logoImg = new Image();
-        let logoSrc = document.getElementById('university-logo').src;
+        // Correctly get logo source from img element inside university-logo div
+        const logoElement = document.querySelector('#university-logo img');
+        let logoSrc = logoElement ? logoElement.src : '../images/logous.png';
+        
+        // If logo src contains relative path, use the image file directly
         if (logoSrc.includes('logous.png')) {
-            logoSrc = 'logous.png';
+            logoSrc = '../images/logous.png';
         }
+        
+        console.log('Loading US university logo:', logoSrc);
+        
         if (!logoSrc.startsWith('http')) {
             logoImg.crossOrigin = null;
         } else {
             logoImg.crossOrigin = 'anonymous';
         }
         await new Promise((resolve) => {
-            logoImg.onload = resolve;
-            logoImg.onerror = resolve;
+            logoImg.onload = () => {
+                console.log('US university logo loaded successfully');
+                resolve();
+            };
+            logoImg.onerror = (e) => {
+                console.warn('US university logo failed to load:', e);
+                resolve();
+            };
             logoImg.src = logoSrc;
-            setTimeout(resolve, 3000);
+            setTimeout(() => {
+                console.log('US university logo timeout reached');
+                resolve();
+            }, 5000);
         });
         if (logoImg.complete && logoImg.naturalWidth > 0) {
+            console.log('Drawing US university logo to canvas');
             // Enhanced logo size to match Seoul University improvements
             const maxLogoWidth = 400;
             const maxLogoHeight = headerHeight - 40;
@@ -541,10 +558,16 @@ async function drawCardManually() {
             }
             const logoX = cardX + 50;
             const logoY = cardY + (headerHeight - drawHeight) / 2;
+            
+            // Draw white background for logo
             ctx.fillStyle = '#ffffff';
             ctx.fillRect(logoX - 8, logoY - 8, drawWidth + 16, drawHeight + 16);
+            
+            // Draw the logo
             ctx.drawImage(logoImg, logoX, logoY, drawWidth, drawHeight);
+            console.log('US university logo drawn successfully');
         } else {
+            console.warn('US university logo not ready, drawing placeholder');
             // Logo placeholder with enhanced size
             const maxLogoWidth = 400;
             const maxLogoHeight = headerHeight - 40;
@@ -559,10 +582,25 @@ async function drawCardManually() {
             ctx.font = 'bold 36px Segoe UI, Arial';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.fillText('LOGO', logoX + maxLogoWidth / 2, logoY + maxLogoHeight / 2);
+            ctx.fillText('US LOGO', logoX + maxLogoWidth / 2, logoY + maxLogoHeight / 2);
         }
     } catch (e) {
         console.warn('Logo loading failed:', e);
+        // Draw fallback logo placeholder
+        const maxLogoWidth = 400;
+        const maxLogoHeight = headerHeight - 40;
+        const logoX = cardX + 50;
+        const logoY = cardY + (headerHeight - maxLogoHeight) / 2;
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(logoX - 8, logoY - 8, maxLogoWidth + 16, maxLogoHeight + 16);
+        ctx.strokeStyle = '#cccccc';
+        ctx.lineWidth = 3;
+        ctx.strokeRect(logoX - 8, logoY - 8, maxLogoWidth + 16, maxLogoHeight + 16);
+        ctx.fillStyle = '#666666';
+        ctx.font = 'bold 36px Segoe UI, Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('US LOGO', logoX + maxLogoWidth / 2, logoY + maxLogoHeight / 2);
     }
     
     // University name - enhanced typography to match Seoul University
@@ -607,11 +645,12 @@ async function drawCardManually() {
                 console.warn('Student photo failed to load for canvas:', e);
                 resolve();
             };
+            // Set src after setting up event handlers
             photoImg.src = photoSrc;
             setTimeout(() => {
                 console.log('Student photo timeout reached');
                 resolve();
-            }, 3000);
+            }, 5000); // Increased timeout from 3000 to 5000
         });
 
         // Enhanced photo dimensions
@@ -622,17 +661,25 @@ async function drawCardManually() {
         photoBottomY = photoY + photoHeight;
 
         if (photoImg.complete && photoImg.naturalWidth > 0) {
+            // Draw white background for photo
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(photoX - 8, photoY - 8, photoWidth + 16, photoHeight + 16);
+            
+            // Draw photo border
             ctx.strokeStyle = '#888888';
             ctx.lineWidth = 6;
             ctx.strokeRect(photoX, photoY, photoWidth, photoHeight);
 
+            // Draw the actual photo
             ctx.save();
             ctx.beginPath();
             ctx.rect(photoX, photoY, photoWidth, photoHeight);
             ctx.clip();
             ctx.drawImage(photoImg, photoX, photoY, photoWidth, photoHeight);
             ctx.restore();
+            console.log('Student photo drawn to canvas successfully');
         } else {
+            console.warn('Student photo not ready, drawing placeholder');
             ctx.fillStyle = '#eeeeee';
             ctx.fillRect(photoX, photoY, photoWidth, photoHeight);
             ctx.strokeStyle = '#888888';
@@ -641,10 +688,28 @@ async function drawCardManually() {
             ctx.fillStyle = '#666666';
             ctx.font = 'bold 26px Segoe UI, Arial';
             ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
             ctx.fillText('PHOTO', photoX + photoWidth/2, photoY + photoHeight/2);
         }
     } catch (e) {
         console.warn('Photo loading failed:', e);
+        // Draw placeholder in case of error
+        const photoWidth = 220;
+        const photoHeight = 270;
+        const photoX = cardX + 70;
+        const photoY = infoY;
+        photoBottomY = photoY + photoHeight;
+        
+        ctx.fillStyle = '#eeeeee';
+        ctx.fillRect(photoX, photoY, photoWidth, photoHeight);
+        ctx.strokeStyle = '#888888';
+        ctx.lineWidth = 6;
+        ctx.strokeRect(photoX, photoY, photoWidth, photoHeight);
+        ctx.fillStyle = '#666666';
+        ctx.font = 'bold 26px Segoe UI, Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('PHOTO', photoX + photoWidth/2, photoY + photoHeight/2);
     }
     
     // Student details - enhanced typography and positioning
@@ -827,6 +892,11 @@ window.onload = async function() {
     showNotification('🚀 Welcome to US Student Card Generator!<br><small>Generating your first card...</small>', 'info', 3000);
     await generateUSStudentCard();
 };
+
+// For compatibility with HTML onclick handler
+async function generateStudentCard() {
+    return await generateUSStudentCard();
+}
 
 // Student Information Extract - Chỉ lấy thông tin, không verify ngay
 function startStudentVerification() {

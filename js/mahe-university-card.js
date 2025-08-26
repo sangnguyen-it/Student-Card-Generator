@@ -424,11 +424,13 @@ async function drawCardManually() {
     if (showWatermark) {
         try {
             const watermarkImg = new Image();
-            // Try to use the university's own logo as watermark first
-            let watermarkSrc = document.getElementById('university-logo').src;
-            if (watermarkSrc.includes('logo-mahe.png')) {
-                watermarkSrc = 'logo-mahe.png';
-            }
+            // Use official MAHE logo as watermark - try multiple sources
+            let watermarkSrc = '../images/watermark_mahe.png';
+            
+            // Alternative: Try to use official MAHE logo from web if local fails
+            const officialMAHELogo = 'https://manipal.edu/content/dam/manipal/mu/images/Manipal-University-Logo.png';
+            
+            console.log('Loading MAHE watermark:', watermarkSrc);
             
             if (!watermarkSrc.startsWith('http')) {
                 watermarkImg.crossOrigin = null;
@@ -437,28 +439,40 @@ async function drawCardManually() {
             }
             
             await new Promise((resolve) => {
+                let primaryFailed = false;
+                
                 watermarkImg.onload = () => {
-                    console.log('MAHE Watermark (university logo) loaded successfully');
+                    console.log('MAHE Watermark loaded successfully');
                     resolve();
                 };
                 watermarkImg.onerror = (e) => {
-                    console.warn('MAHE Watermark (university logo) failed to load:', e);
-                    resolve();
+                    console.warn('MAHE Watermark failed to load:', e);
+                    if (!primaryFailed && watermarkSrc !== officialMAHELogo) {
+                        console.log('Trying official MAHE logo from web...');
+                        primaryFailed = true;
+                        watermarkImg.crossOrigin = 'anonymous';
+                        watermarkImg.src = officialMAHELogo;
+                    } else {
+                        resolve();
+                    }
                 };
+                
+                // Start with local logo first
                 watermarkImg.src = watermarkSrc;
+                
                 setTimeout(() => {
                     console.log('MAHE Watermark timeout reached');
                     resolve();
-                }, 3000);
+                }, 8000); // Increased timeout for web requests
             });
             
             if (watermarkImg.complete && watermarkImg.naturalWidth > 0) {
                 console.log('Drawing MAHE university logo as watermark to canvas');
                 ctx.save();
-                ctx.globalAlpha = 0.15; // More subtle for logo
+                ctx.globalAlpha = 0.08; // More subtle for MAHE logo
                 
-                // Calculate proper aspect ratio for watermark
-                const maxWatermarkSize = 900; // Tăng từ 400 lên 520 để watermark to hơn
+                // Calculate proper aspect ratio for MAHE watermark
+                const maxWatermarkSize = 900; // Optimal size for MAHE logo
                 const aspectRatio = watermarkImg.naturalWidth / watermarkImg.naturalHeight;
                 let watermarkWidth, watermarkHeight;
                 
@@ -472,34 +486,35 @@ async function drawCardManually() {
                     watermarkWidth = maxWatermarkSize * aspectRatio;
                 }
                 
+                // Position watermark slightly lower and centered
                 const watermarkX = (cardWidth - watermarkWidth) / 2;
-                const watermarkY = (cardHeight - watermarkHeight) / 2;
+                const watermarkY = (cardHeight - watermarkHeight) / 2 + 50; // Slightly lower
                 ctx.drawImage(watermarkImg, watermarkX, watermarkY, watermarkWidth, watermarkHeight);
                 ctx.restore();
             } else {
                 console.warn('MAHE Watermark not ready, drawing fallback');
-                // Fallback watermark using text
+                // Fallback watermark using MAHE text
                 ctx.save();
-                ctx.globalAlpha = 0.15;
-                ctx.font = 'bold 48px Arial';
+                ctx.globalAlpha = 0.12;
+                ctx.font = 'bold 52px Arial';
                 ctx.fillStyle = '#ff6600';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
-                const universityName = document.getElementById('university-name').textContent;
-                ctx.fillText(universityName.toUpperCase(), cardWidth / 2, cardHeight / 2);
+                ctx.fillText('MANIPAL ACADEMY', cardWidth / 2, cardHeight / 2 - 30);
+                ctx.fillText('OF HIGHER EDUCATION', cardWidth / 2, cardHeight / 2 + 30);
                 ctx.restore();
             }
         } catch (e) {
             console.warn('Watermark loading failed, using fallback:', e);
-            // Fallback watermark using university name
+            // Fallback watermark using MAHE text
             ctx.save();
-            ctx.globalAlpha = 0.15;
-            ctx.font = 'bold 48px Arial';
+            ctx.globalAlpha = 0.12;
+            ctx.font = 'bold 52px Arial';
             ctx.fillStyle = '#ff6600';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            const universityName = document.getElementById('university-name').textContent;
-            ctx.fillText(universityName.toUpperCase(), cardWidth / 2, cardHeight / 2);
+            ctx.fillText('MANIPAL ACADEMY', cardWidth / 2, cardHeight / 2 - 30);
+            ctx.fillText('OF HIGHER EDUCATION', cardWidth / 2, cardHeight / 2 + 30);
             ctx.restore();
         }
     } else {
@@ -519,22 +534,39 @@ async function drawCardManually() {
     // Load and draw university logo (enlarged to 400px)
     try {
         const logoImg = new Image();
-        let logoSrc = document.getElementById('university-logo').src;
-        if (logoSrc.includes('MUlogo-scaled.jpg') || logoSrc.includes('mahe')) {
-            logoSrc = 'logo-mahe.png';
+        // Correctly get logo source from img element inside university-logo div
+        const logoElement = document.querySelector('#university-logo img');
+        let logoSrc = logoElement ? logoElement.src : '../images/watermark_mahe.png';
+        
+        // If logo src contains relative path, use the image file directly
+        if (logoSrc.includes('watermark_mahe.png')) {
+            logoSrc = '../images/watermark_mahe.png';
         }
+        
+        console.log('Loading university logo:', logoSrc);
+        
         if (!logoSrc.startsWith('http')) {
             logoImg.crossOrigin = null;
         } else {
             logoImg.crossOrigin = 'anonymous';
         }
         await new Promise((resolve) => {
-            logoImg.onload = resolve;
-            logoImg.onerror = resolve;
+            logoImg.onload = () => {
+                console.log('University logo loaded successfully');
+                resolve();
+            };
+            logoImg.onerror = (e) => {
+                console.warn('University logo failed to load:', e);
+                resolve();
+            };
             logoImg.src = logoSrc;
-            setTimeout(resolve, 3000);
+            setTimeout(() => {
+                console.log('University logo timeout reached');
+                resolve();
+            }, 5000);
         });
         if (logoImg.complete && logoImg.naturalWidth > 0) {
+            console.log('Drawing university logo to canvas');
             // Enhanced logo size to match Seoul University improvements
             const maxLogoWidth = 400;
             const maxLogoHeight = headerHeight - 40;
@@ -546,10 +578,16 @@ async function drawCardManually() {
             }
             const logoX = cardX + 50;
             const logoY = cardY + (headerHeight - drawHeight) / 2;
+            
+            // Draw white background for logo
             ctx.fillStyle = '#ffffff';
             ctx.fillRect(logoX - 8, logoY - 8, drawWidth + 16, drawHeight + 16);
+            
+            // Draw the logo
             ctx.drawImage(logoImg, logoX, logoY, drawWidth, drawHeight);
+            console.log('University logo drawn successfully');
         } else {
+            console.warn('University logo not ready, drawing placeholder');
             // Logo placeholder with enhanced size
             const maxLogoWidth = 400;
             const maxLogoHeight = headerHeight - 40;
@@ -564,10 +602,25 @@ async function drawCardManually() {
             ctx.font = 'bold 36px Segoe UI, Arial';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.fillText('LOGO', logoX + maxLogoWidth / 2, logoY + maxLogoHeight / 2);
+            ctx.fillText('MAHE LOGO', logoX + maxLogoWidth / 2, logoY + maxLogoHeight / 2);
         }
     } catch (e) {
         console.warn('Logo loading failed:', e);
+        // Draw fallback logo placeholder
+        const maxLogoWidth = 400;
+        const maxLogoHeight = headerHeight - 40;
+        const logoX = cardX + 50;
+        const logoY = cardY + (headerHeight - maxLogoHeight) / 2;
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(logoX - 8, logoY - 8, maxLogoWidth + 16, maxLogoHeight + 16);
+        ctx.strokeStyle = '#cccccc';
+        ctx.lineWidth = 3;
+        ctx.strokeRect(logoX - 8, logoY - 8, maxLogoWidth + 16, maxLogoHeight + 16);
+        ctx.fillStyle = '#666666';
+        ctx.font = 'bold 36px Segoe UI, Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('MAHE LOGO', logoX + maxLogoWidth / 2, logoY + maxLogoHeight / 2);
     }
     
     // University name - enhanced typography to match Seoul University
@@ -612,11 +665,12 @@ async function drawCardManually() {
                 console.warn('Student photo failed to load for canvas:', e);
                 resolve();
             };
+            // Set src after setting up event handlers
             photoImg.src = photoSrc;
             setTimeout(() => {
                 console.log('Student photo timeout reached');
                 resolve();
-            }, 3000);
+            }, 5000); // Increased timeout from 3000 to 5000
         });
 
         // Enhanced photo dimensions
@@ -627,17 +681,25 @@ async function drawCardManually() {
         photoBottomY = photoY + photoHeight;
 
         if (photoImg.complete && photoImg.naturalWidth > 0) {
+            // Draw white background for photo
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(photoX - 8, photoY - 8, photoWidth + 16, photoHeight + 16);
+            
+            // Draw photo border
             ctx.strokeStyle = '#888888';
             ctx.lineWidth = 6;
             ctx.strokeRect(photoX, photoY, photoWidth, photoHeight);
 
+            // Draw the actual photo
             ctx.save();
             ctx.beginPath();
             ctx.rect(photoX, photoY, photoWidth, photoHeight);
             ctx.clip();
             ctx.drawImage(photoImg, photoX, photoY, photoWidth, photoHeight);
             ctx.restore();
+            console.log('Student photo drawn to canvas successfully');
         } else {
+            console.warn('Student photo not ready, drawing placeholder');
             ctx.fillStyle = '#eeeeee';
             ctx.fillRect(photoX, photoY, photoWidth, photoHeight);
             ctx.strokeStyle = '#888888';
@@ -646,10 +708,28 @@ async function drawCardManually() {
             ctx.fillStyle = '#666666';
             ctx.font = 'bold 26px Segoe UI, Arial';
             ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
             ctx.fillText('PHOTO', photoX + photoWidth/2, photoY + photoHeight/2);
         }
     } catch (e) {
         console.warn('Photo loading failed:', e);
+        // Draw placeholder in case of error
+        const photoWidth = 220;
+        const photoHeight = 270;
+        const photoX = cardX + 70;
+        const photoY = infoY;
+        photoBottomY = photoY + photoHeight;
+        
+        ctx.fillStyle = '#eeeeee';
+        ctx.fillRect(photoX, photoY, photoWidth, photoHeight);
+        ctx.strokeStyle = '#888888';
+        ctx.lineWidth = 6;
+        ctx.strokeRect(photoX, photoY, photoWidth, photoHeight);
+        ctx.fillStyle = '#666666';
+        ctx.font = 'bold 26px Segoe UI, Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('PHOTO', photoX + photoWidth/2, photoY + photoHeight/2);
     }
     
     // Student details - enhanced typography and positioning
