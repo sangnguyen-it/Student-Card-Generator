@@ -84,7 +84,7 @@ const usFirstNames = [
     "Daniel", "Matthew", "Anthony", "Mark", "Donald", "Steven", "Paul", "Joshua", "Kenneth", "Kevin",
     "Brian", "George", "Timothy", "Ronald", "Jason", "Edward", "Jeffrey", "Ryan", "Jacob", "Gary",
     "Nicholas", "Eric", "Jonathan", "Stephen", "Larry", "Justin", "Scott", "Brandon", "Benjamin", "Samuel",
-    
+
     // Female names
     "Mary", "Patricia", "Jennifer", "Linda", "Elizabeth", "Barbara", "Susan", "Jessica", "Sarah", "Karen",
     "Lisa", "Nancy", "Betty", "Helen", "Sandra", "Donna", "Carol", "Ruth", "Sharon", "Michelle",
@@ -182,7 +182,7 @@ function showPhotoSelection(photoList, selectedIndex = 0) {
         }
     }
     container.innerHTML = '';
-    
+
     // Tạo header cho photo selection
     const header = document.createElement('h4');
     header.textContent = '📸 Chọn ảnh sinh viên';
@@ -190,18 +190,18 @@ function showPhotoSelection(photoList, selectedIndex = 0) {
     header.style.marginBottom = '10px';
     header.style.marginTop = '0';
     container.appendChild(header);
-    
+
     // Tạo container cho thumbnails
     const thumbnailContainer = document.createElement('div');
     thumbnailContainer.style.display = 'flex';
     thumbnailContainer.style.gap = '10px';
     thumbnailContainer.style.justifyContent = 'center';
     thumbnailContainer.style.flexWrap = 'wrap';
-    
+
     photoList.forEach((url, idx) => {
         const img = document.createElement('img');
         img.src = url;
-        img.alt = `Photo ${idx+1}`;
+        img.alt = `Photo ${idx + 1}`;
         img.style.width = '60px';
         img.style.height = '75px';
         img.style.objectFit = 'cover';
@@ -215,7 +215,7 @@ function showPhotoSelection(photoList, selectedIndex = 0) {
         };
         thumbnailContainer.appendChild(img);
     });
-    
+
     container.appendChild(thumbnailContainer);
     container.classList.add('show');
 }
@@ -227,12 +227,12 @@ function generateUSRandomDate() {
     const today = new Date();
     const minAge = 18;
     const maxAge = 25;
-    
+
     const randomAge = minAge + Math.floor(Math.random() * (maxAge - minAge + 1));
     const birthYear = today.getFullYear() - randomAge;
     const birthMonth = Math.floor(Math.random() * 12) + 1;
     const birthDay = Math.floor(Math.random() * 28) + 1;
-    
+
     // US format: MM/DD/YYYY
     return `${birthMonth.toString().padStart(2, '0')}/${birthDay.toString().padStart(2, '0')}/${birthYear}`;
 }
@@ -257,7 +257,7 @@ function generateUSValidUntil() {
     const month = Math.floor(Math.random() * 12) + 1;
     const year = Math.random() < 0.5 ? startYear : endYear;
     const day = Math.floor(Math.random() * 28) + 1;
-    
+
     // US format: MM/DD/YYYY
     return `${month.toString().padStart(2, '0')}/${day.toString().padStart(2, '0')}/${year}`;
 }
@@ -268,7 +268,7 @@ async function generateUSStudentCard() {
     const btnText = generateBtn.querySelector('.btn-text') || generateBtn;
     const originalText = btnText.textContent;
     const card = document.querySelector('.card');
-    
+
     // Add loading spinner and disable button
     btnText.innerHTML = '<span class="loading-spinner"></span>Generating...';
     generateBtn.disabled = true;
@@ -278,15 +278,27 @@ async function generateUSStudentCard() {
     try {
         // Add a small delay for better UX perception
         await new Promise(resolve => setTimeout(resolve, 500));
-        
+
         const university = getRandomElement(usUniversities);
-        const studentName = generateUSFullName();
+
+        // Sử dụng input fields nếu có, ngược lại dùng random data
+        const nameInput = document.getElementById('input-name');
+        const dobInput = document.getElementById('input-dob');
+        const studentIdInput = document.getElementById('input-student-id');
+
+        const studentName = (nameInput && nameInput.value.trim()) ? nameInput.value.trim() : generateUSFullName();
+        const dob = (dobInput && dobInput.value.trim()) ? dobInput.value.trim() : generateUSRandomDate();
+        const studentID = (studentIdInput && studentIdInput.value.trim()) ? studentIdInput.value.trim() : generateUSStudentID(university.shortName);
+
         const school = getRandomElement(usSchools);
         const major = getRandomElement(usMajors);
-        const dob = generateUSRandomDate();
         const course = generateUSCourse();
-        const studentID = generateUSStudentID(university.shortName);
         const validUntil = generateUSValidUntil();
+
+        // Cập nhật input fields với giá trị được sử dụng (nếu là random)
+        if (nameInput && !nameInput.value.trim()) nameInput.value = studentName;
+        if (dobInput && !dobInput.value.trim()) dobInput.value = dob;
+        if (studentIdInput && !studentIdInput.value.trim()) studentIdInput.value = studentID;
 
         // Show progress update
         btnText.innerHTML = '<span class="loading-spinner"></span>Loading Photos...';
@@ -305,11 +317,15 @@ async function generateUSStudentCard() {
         document.getElementById('university-name').textContent = university.name;
         document.getElementById('student-name').textContent = studentName;
         document.getElementById('student-dob').textContent = dob;
-        document.getElementById('student-course').textContent = course;
+        // Course field is hidden as requested
+        // document.getElementById('student-course').textContent = course;
         document.getElementById('student-class').textContent = major;
         document.getElementById('student-department').textContent = school;
-        document.getElementById('student-id').innerHTML = `Student ID: ${studentID}`;
+        document.getElementById('student-id').textContent = studentID;
         document.getElementById('valid-until').textContent = validUntil;
+
+        // Update back side with new data
+        updateBackSide();
 
         // Load images with progress feedback
         btnText.innerHTML = '<span class="loading-spinner"></span>Loading Images...';
@@ -320,9 +336,11 @@ async function generateUSStudentCard() {
         // Hiển thị danh sách thumbnail cho người dùng chọn
         showPhotoSelection(studentPhotoList, randomIndex);
 
-        // Update barcode
+        // Update barcode with improved visibility
         const barcodeUrl = `/api/barcode?data=${encodeURIComponent(university.name)}&code=Code128`;
-        document.getElementById('barcode').src = barcodeUrl;
+        const barcodeElement = document.getElementById('barcode');
+        barcodeElement.src = barcodeUrl;
+        console.log('🔗 Barcode URL:', barcodeUrl);
 
         // Restore card opacity with animation
         card.style.opacity = '1';
@@ -343,12 +361,12 @@ async function generateUSStudentCard() {
         // Enhanced error feedback with notification
         btnText.innerHTML = '❌ Generation Failed';
         await new Promise(resolve => setTimeout(resolve, 1000));
-        
+
         // Show user-friendly error message via notification
-        const errorMessage = error.message.includes('fetch') 
-            ? 'Network error: Please check your internet connection and try again.' 
+        const errorMessage = error.message.includes('fetch')
+            ? 'Network error: Please check your internet connection and try again.'
             : `Error: ${error.message}`;
-        
+
         showNotification(`❌ Unable to generate student card.<br><small>${errorMessage}</small>`, 'error', 5000);
     } finally {
         // Restore button state with smooth transition
@@ -357,14 +375,29 @@ async function generateUSStudentCard() {
             generateBtn.disabled = false;
             generateBtn.style.pointerEvents = 'auto';
             card.classList.remove('generating');
-            
-            // Enable download button with animation
+
+            // Enable download buttons with animation
             const downloadBtn = document.querySelector('.btn-download');
+            const downloadBothBtn = document.getElementById('download-both-btn');
+
             downloadBtn.disabled = false;
             downloadBtn.style.opacity = '1';
             downloadBtn.style.transform = 'scale(1.05)';
+
+            const downloadBackBtn = document.getElementById('download-back-btn');
+
+            downloadBothBtn.disabled = false;
+            downloadBothBtn.style.opacity = '1';
+            downloadBothBtn.style.transform = 'scale(1.05)';
+
+            downloadBackBtn.disabled = false;
+            downloadBackBtn.style.opacity = '1';
+            downloadBackBtn.style.transform = 'scale(1.05)';
+
             setTimeout(() => {
                 downloadBtn.style.transform = 'scale(1)';
+                downloadBothBtn.style.transform = 'scale(1)';
+                downloadBackBtn.style.transform = 'scale(1)';
             }, 200);
         }, 500);
     }
@@ -373,26 +406,39 @@ async function generateUSStudentCard() {
 async function downloadCard() {
     const downloadBtn = document.querySelector('.btn-download');
     const originalText = downloadBtn.textContent;
-    
+
     try {
         // Enhanced loading state for download
         downloadBtn.innerHTML = '<span class="loading-spinner"></span>Creating Image...';
         downloadBtn.disabled = true;
         downloadBtn.style.pointerEvents = 'none';
-        
+
         // Add a small delay for UX
         await new Promise(resolve => setTimeout(resolve, 300));
-        
+
         downloadBtn.innerHTML = '<span class="loading-spinner"></span>Processing...';
-        
-        // Create the image
-        await drawCardManually();
-        
+
+        // Check if card is flipped (showing back side)
+        const card = document.querySelector('.card');
+        const isFlipped = card.classList.contains('flipped');
+
+        if (isFlipped) {
+            // Download back side (clean version without text)
+            showNotification('🔄 Downloading BACK SIDE (clean - only logo & background)', 'info', 1500);
+            await new Promise(resolve => setTimeout(resolve, 500));
+            await downloadBackSideClean();
+        } else {
+            // Download front side using existing method
+            showNotification('📋 Downloading FRONT SIDE (with all information)', 'info', 1500);
+            await new Promise(resolve => setTimeout(resolve, 500));
+            await drawCardManually();
+        }
+
         // Success feedback with notification
         downloadBtn.innerHTML = '✅ Download Complete!';
         showNotification('💾 Card downloaded successfully!', 'success', 2000);
         await new Promise(resolve => setTimeout(resolve, 1500));
-        
+
     } catch (error) {
         console.error('Download error:', error);
         downloadBtn.innerHTML = '❌ Download Failed';
@@ -411,28 +457,28 @@ async function downloadCard() {
 async function drawCardManually() {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
-    
+
     // Enhanced canvas size for higher quality
     canvas.width = 1600;
-    canvas.height = 1000;
+    canvas.height = 850; /* Reduced from 950 to match 300px wrapper height */
 
     // Card positioning and sizing
     const cardX = 0, cardY = 0;
-    const cardWidth = 1600, cardHeight = 1000;
+    const cardWidth = 1600, cardHeight = 850;
 
     // Card background
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(cardX, cardY, cardWidth, cardHeight);
-    
+
     // Add watermark background (only if checkbox is checked)
     const watermarkCheckbox = document.getElementById('watermark-checkbox');
     const showWatermark = watermarkCheckbox ? watermarkCheckbox.checked : true; // Default to true if checkbox not found
-    
+
     if (showWatermark) {
         try {
             const watermarkImg = new Image();
             watermarkImg.crossOrigin = 'anonymous';
-            
+
             await new Promise((resolve) => {
                 watermarkImg.onload = () => {
                     console.log('Santa Fe College watermark loaded successfully');
@@ -448,17 +494,17 @@ async function drawCardManually() {
                     resolve();
                 }, 5000);
             });
-            
+
             if (watermarkImg.complete && watermarkImg.naturalWidth > 0) {
                 console.log('Drawing Santa Fe College seal as watermark to canvas');
                 ctx.save();
                 ctx.globalAlpha = 0.15; // Slightly more visible for official seal
-                
+
                 // Calculate proper aspect ratio for watermark
                 const maxWatermarkSize = 900; // Tăng từ 380 lên 500 để watermark to hơn
                 const aspectRatio = watermarkImg.naturalWidth / watermarkImg.naturalHeight;
                 let watermarkWidth, watermarkHeight;
-                
+
                 if (aspectRatio > 1) {
                     // Landscape: width is larger
                     watermarkWidth = maxWatermarkSize;
@@ -468,7 +514,7 @@ async function drawCardManually() {
                     watermarkHeight = maxWatermarkSize;
                     watermarkWidth = maxWatermarkSize * aspectRatio;
                 }
-                
+
                 const watermarkX = (cardWidth - watermarkWidth) / 2;
                 const watermarkY = (cardHeight - watermarkHeight) / 2;
                 ctx.drawImage(watermarkImg, watermarkX, watermarkY, watermarkWidth, watermarkHeight);
@@ -500,7 +546,7 @@ async function drawCardManually() {
     } else {
         console.log('Watermark disabled by user - skipping watermark rendering');
     }
-    
+
     // Card border with rounded corners
     ctx.strokeStyle = '#222222';
     ctx.lineWidth = 4;
@@ -510,21 +556,21 @@ async function drawCardManually() {
     const headerHeight = 240;
     ctx.fillStyle = '#6a9ed8';
     ctx.fillRect(cardX, cardY, cardWidth, headerHeight);
-    
+
     // Load and draw university logo (enlarged to 400px)
     try {
         const logoImg = new Image();
         // Correctly get logo source from img element inside university-logo div
         const logoElement = document.querySelector('#university-logo img');
         let logoSrc = logoElement ? logoElement.src : '../images/logous.png';
-        
+
         // If logo src contains relative path, use the image file directly
         if (logoSrc.includes('logous.png')) {
             logoSrc = '../images/logous.png';
         }
-        
+
         console.log('Loading US university logo:', logoSrc);
-        
+
         if (!logoSrc.startsWith('http')) {
             logoImg.crossOrigin = null;
         } else {
@@ -558,11 +604,11 @@ async function drawCardManually() {
             }
             const logoX = cardX + 50;
             const logoY = cardY + (headerHeight - drawHeight) / 2;
-            
+
             // Draw white background for logo
             ctx.fillStyle = '#ffffff';
             ctx.fillRect(logoX - 8, logoY - 8, drawWidth + 16, drawHeight + 16);
-            
+
             // Draw the logo
             ctx.drawImage(logoImg, logoX, logoY, drawWidth, drawHeight);
             console.log('US university logo drawn successfully');
@@ -602,7 +648,7 @@ async function drawCardManually() {
         ctx.textBaseline = 'middle';
         ctx.fillText('US LOGO', logoX + maxLogoWidth / 2, logoY + maxLogoHeight / 2);
     }
-    
+
     // University name - enhanced typography to match Seoul University
     ctx.fillStyle = '#ffffff';
     ctx.font = 'bold 58px Segoe UI, Arial';
@@ -621,21 +667,21 @@ async function drawCardManually() {
     ctx.font = 'bold 48px Segoe UI, Arial';
     const studentCardY = textY + (lines.length * 68) + 24;
     ctx.fillText('STUDENT ID CARD', textStartX, studentCardY);
-    
+
     // Info section - enhanced spacing and positioning
     const infoY = cardY + headerHeight + 50;
-    
+
     // Load and draw student photo - enhanced size
     let photoBottomY = infoY;
     try {
         const photoImg = new Image();
         const photoSrc = document.getElementById('student-photo-img').src;
-        
+
         // Only set crossOrigin for external URLs
         if (photoSrc.startsWith('http') && !photoSrc.includes('localhost')) {
             photoImg.crossOrigin = 'anonymous';
         }
-        
+
         await new Promise((resolve) => {
             photoImg.onload = () => {
                 console.log('Student photo loaded successfully for canvas');
@@ -664,7 +710,7 @@ async function drawCardManually() {
             // Draw white background for photo
             ctx.fillStyle = '#ffffff';
             ctx.fillRect(photoX - 8, photoY - 8, photoWidth + 16, photoHeight + 16);
-            
+
             // Draw photo border
             ctx.strokeStyle = '#888888';
             ctx.lineWidth = 6;
@@ -689,7 +735,7 @@ async function drawCardManually() {
             ctx.font = 'bold 26px Segoe UI, Arial';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.fillText('PHOTO', photoX + photoWidth/2, photoY + photoHeight/2);
+            ctx.fillText('PHOTO', photoX + photoWidth / 2, photoY + photoHeight / 2);
         }
     } catch (e) {
         console.warn('Photo loading failed:', e);
@@ -699,7 +745,7 @@ async function drawCardManually() {
         const photoX = cardX + 70;
         const photoY = infoY;
         photoBottomY = photoY + photoHeight;
-        
+
         ctx.fillStyle = '#eeeeee';
         ctx.fillRect(photoX, photoY, photoWidth, photoHeight);
         ctx.strokeStyle = '#888888';
@@ -709,9 +755,9 @@ async function drawCardManually() {
         ctx.font = 'bold 26px Segoe UI, Arial';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText('PHOTO', photoX + photoWidth/2, photoY + photoHeight/2);
+        ctx.fillText('PHOTO', photoX + photoWidth / 2, photoY + photoHeight / 2);
     }
-    
+
     // Student details - enhanced typography and positioning
     ctx.textAlign = 'left';
     const detailsX = cardX + 340;
@@ -719,14 +765,15 @@ async function drawCardManually() {
     const details = [
         { label: 'Name:', value: document.getElementById('student-name').textContent, bold: true },
         { label: 'Date of Birth:', value: document.getElementById('student-dob').textContent },
-        { label: 'Program:', value: document.getElementById('student-course').textContent },
+        // Program/Course field is hidden as requested
+        // { label: 'Program:', value: document.getElementById('student-course').textContent },
         { label: 'Major:', value: document.getElementById('student-class').textContent },
         { label: 'Department:', value: document.getElementById('student-department').textContent }
     ];
 
     details.forEach((detail, index) => {
-        // Enhanced spacing to match Seoul University improvements
-        const y = infoY + 34 + (index * 64);
+        // Reduced spacing for compact layout
+        const y = infoY + 34 + (index * 45); /* Reduced from 52 to 45 for tighter spacing */
 
         ctx.fillStyle = '#1a7ec7';
         ctx.font = 'bold 34px Segoe UI, Arial';
@@ -745,14 +792,14 @@ async function drawCardManually() {
         ctx.font = detail.bold ? 'bold 40px Segoe UI, Arial' : '36px Segoe UI, Arial';
         ctx.fillText(detail.value, detailsX + labelWidth + valueOffset, y);
     });
-    
+
     // Valid until - enhanced positioning below photo
     ctx.fillStyle = '#444444';
-    ctx.font = '28px Segoe UI, Arial';
+    ctx.font = '32px Segoe UI, Arial'; /* Reduced from 38px to 32px for compact layout */
     const validText = `Valid until: ${document.getElementById('valid-until').textContent}`;
-    const validY = photoBottomY + 40;
+    const validY = photoBottomY + 8; /* Reduced from 15 to 8 for tighter spacing */
     ctx.fillText(validText, cardX + 70, validY);
-    
+
     // Load and draw barcode - repositioned lower with better spacing
     try {
         const barcodeImg = new Image();
@@ -764,8 +811,8 @@ async function drawCardManually() {
             setTimeout(resolve, 3000);
         });
 
-        // Enhanced barcode positioning - moved lower to avoid crowding
-        const barcodeY = validY + 50;
+        // Enhanced barcode positioning - moved lower for better spacing
+        const barcodeY = validY + 45; /* Increased from 15 to 45 to move barcode down */
         const barcodeStartX = cardX + 70;
         const barcodeWidth = 1350;
         const barcodeHeight = 90;
@@ -789,7 +836,7 @@ async function drawCardManually() {
     } catch (e) {
         console.warn('Barcode loading failed:', e);
         ctx.fillStyle = '#000000';
-        const barcodeY = validY + 50;
+        const barcodeY = validY + 45;
         const barcodeStartX = cardX + 70;
         const barcodeWidth = 1350;
         const barcodeHeight = 90;
@@ -805,9 +852,9 @@ async function drawCardManually() {
             }
         }
     }
-    
-    // Footer elements - enhanced typography and positioning
-    const footerY = cardY + cardHeight - 50;
+
+    // Footer elements - enhanced typography and positioning  
+    const footerY = cardY + cardHeight - 25; /* Moved up to make room for lower barcode */
 
     // Student ID (bottom left) - enhanced font size
     ctx.fillStyle = '#222222';
@@ -819,7 +866,7 @@ async function drawCardManually() {
     // United States (bottom right) - enhanced font size
     ctx.textAlign = 'right';
     ctx.fillText('🇺🇸 United States', cardX + cardWidth - 70, footerY);
-    
+
     // Download the canvas
     canvas.toBlob((blob) => {
         const url = URL.createObjectURL(blob);
@@ -827,11 +874,13 @@ async function drawCardManually() {
         const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
         link.download = `student-card-${timestamp}.png`;
         link.href = url;
-        
+
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-        
+
+        console.log('✅ Downloaded FRONT SIDE: Full information with all text and data');
+
         URL.revokeObjectURL(url);
         console.log('Download completed successfully!');
     }, 'image/png', 1.0);
@@ -841,7 +890,7 @@ function wrapText(ctx, text, maxWidth) {
     const words = text.split(' ');
     const lines = [];
     let currentLine = words[0];
-    
+
     for (let i = 1; i < words.length; i++) {
         const word = words[i];
         const width = ctx.measureText(currentLine + ' ' + word).width;
@@ -863,19 +912,19 @@ function showNotification(message, type = 'info', duration = 3000) {
     if (existingNotification) {
         existingNotification.remove();
     }
-    
+
     // Create new notification
     const notification = document.createElement('div');
     notification.className = `notification ${type}`;
     notification.innerHTML = message;
-    
+
     document.body.appendChild(notification);
-    
+
     // Show notification
     setTimeout(() => {
         notification.classList.add('show');
     }, 100);
-    
+
     // Hide notification
     setTimeout(() => {
         notification.classList.remove('show');
@@ -888,7 +937,7 @@ function showNotification(message, type = 'info', duration = 3000) {
 }
 
 // Generate initial card khi trang được load
-window.onload = async function() {
+window.onload = async function () {
     showNotification('🚀 Welcome to US Student Card Generator!<br><small>Generating your first card...</small>', 'info', 3000);
     await generateUSStudentCard();
 };
@@ -902,18 +951,18 @@ async function generateStudentCard() {
 function startStudentVerification() {
     const verifyBtn = document.querySelector('.btn-verify');
     const originalText = verifyBtn.textContent;
-    
+
     try {
         // Kiểm tra xem Chrome Extension có được cài đặt không
         if (typeof window.studentCardVerifier === 'undefined') {
             showNotification('❌ Chrome Extension chưa được cài đặt!<br><small>Vui lòng cài đặt "Student Card Auto Verifier" extension từ thư mục 1NutLamNenTatCa</small>', 'error', 6000);
             return;
         }
-        
+
         // Lấy thông tin từ student card hiện tại
         const studentInfo = extractStudentInfo();
         console.log('🔍 DEBUG: Extracted student info:', studentInfo);
-        
+
         // Kiểm tra thông tin có hợp lệ không
         if (!studentInfo.school || !studentInfo.firstName) {
             showNotification('⚠️ No student card data found!<br><small>Please generate a student card first</small>', 'error', 4000);
@@ -922,28 +971,28 @@ function startStudentVerification() {
             verifyBtn.style.pointerEvents = 'auto';
             return;
         }
-        
+
         // Update button state - chỉ extract thông tin
         verifyBtn.innerHTML = '<span class="loading-spinner"></span>Extracting Info...';
         verifyBtn.disabled = true;
         verifyBtn.style.pointerEvents = 'none';
-        
+
         // Gửi thông tin student card đến extension để lưu (không verify ngay)
         window.postMessage({
             type: 'STUDENT_CARD_EXTRACT',
             studentInfo: studentInfo,
             autoVerify: false  // Không verify ngay
         }, '*');
-        
+
         // Lắng nghe response từ extension
         const messageHandler = (event) => {
             if (event.data.type === 'INFO_EXTRACTED') {
                 window.removeEventListener('message', messageHandler);
-                
+
                 if (event.data.success) {
                     verifyBtn.innerHTML = '✅ Info Extracted!';
                     showNotification('� Student info extracted successfully!<br><small>Data saved to extension. Click "Bắt đầu xác minh" in extension popup to verify.</small>', 'success', 8000);
-                    
+
                     // Mở extension popup sau khi extract thành công
                     setTimeout(() => {
                         showNotification('💡 Click extension icon to open popup and verify!', 'info', 5000);
@@ -952,7 +1001,7 @@ function startStudentVerification() {
                     verifyBtn.innerHTML = '❌ Extract Failed';
                     showNotification('❌ Failed to extract student info<br><small>Please try again or check extension</small>', 'error', 4000);
                 }
-                
+
                 // Restore button state
                 setTimeout(() => {
                     verifyBtn.textContent = originalText;
@@ -961,12 +1010,12 @@ function startStudentVerification() {
                 }, 3000);
             }
         };
-        
+
         window.addEventListener('message', messageHandler);
-        
+
         // Gọi Chrome Extension với thông tin student
         window.studentCardVerifier.startWithData(studentInfo);
-        
+
         // Timeout fallback
         setTimeout(() => {
             window.removeEventListener('message', messageHandler);
@@ -977,7 +1026,7 @@ function startStudentVerification() {
                 showNotification('⏰ Verification timeout<br><small>Please try again</small>', 'error', 3000);
             }
         }, 10000);
-        
+
     } catch (error) {
         console.error('Verification error:', error);
         verifyBtn.textContent = originalText;
@@ -995,12 +1044,12 @@ function extractStudentInfo() {
         const studentName = document.getElementById('student-name')?.textContent?.trim() || '';
         const studentDob = document.getElementById('student-dob')?.textContent?.trim() || '';
         const studentDepartment = document.getElementById('student-department')?.textContent?.trim() || '';
-        
+
         // Tách họ và tên
         const nameParts = studentName.split(' ');
         const firstName = nameParts[0] || '';
         const lastName = nameParts.slice(1).join(' ') || '';
-        
+
         // Detect country từ source URL
         const sourceUrl = window.location.pathname;
         let country = 'Vietnam'; // Default
@@ -1009,12 +1058,12 @@ function extractStudentInfo() {
         } else if (sourceUrl.includes('thesinhvien') && !sourceUrl.includes('us')) {
             country = 'India';
         }
-        
+
         // Tạo email giả từ tên và trường (có thể customize)
         const emailPrefix = firstName.toLowerCase() + '.' + lastName.toLowerCase().replace(/\s+/g, '');
         const emailDomain = getEmailDomainFromUniversity(universityName);
         const email = `${emailPrefix}@${emailDomain}`;
-        
+
         const studentInfo = {
             school: universityName,
             firstName: firstName,
@@ -1027,10 +1076,10 @@ function extractStudentInfo() {
             extractedAt: new Date().toISOString(),
             source: sourceUrl  // Sẽ là /thesinhvien.html hoặc /thesinhvienus.html
         };
-        
+
         console.log('Extracted student info:', studentInfo);
         return studentInfo;
-        
+
     } catch (error) {
         console.error('Error extracting student info:', error);
         return {
@@ -1064,6 +1113,442 @@ function getEmailDomainFromUniversity(universityName) {
         // 'California Institute of Technology': 'caltech.edu',
         'Santa Fe College': 'sfcollege.edu'
     };
-    
+
     return domainMap[universityName] || 'student.edu';
 }
+
+// ==================== DYNAMIC INPUT FUNCTIONS ====================
+
+// Hàm cập nhật thẻ từ input fields real-time
+function updateCardFromInputs() {
+    const nameInput = document.getElementById('input-name');
+    const dobInput = document.getElementById('input-dob');
+    const studentIdInput = document.getElementById('input-student-id');
+
+    // Cập nhật tên
+    if (nameInput && nameInput.value.trim()) {
+        document.getElementById('student-name').textContent = nameInput.value.trim();
+    }
+
+    // Cập nhật ngày sinh
+    if (dobInput && dobInput.value.trim()) {
+        document.getElementById('student-dob').textContent = dobInput.value.trim();
+    }
+
+    // Cập nhật mã sinh viên
+    if (studentIdInput && studentIdInput.value.trim()) {
+        document.getElementById('student-id').textContent = studentIdInput.value.trim();
+    }
+
+    // Update back side as well
+    updateBackSide();
+}
+
+// Xóa tất cả input fields
+function clearInputs() {
+    document.getElementById('input-name').value = '';
+    document.getElementById('input-dob').value = '';
+    document.getElementById('input-student-id').value = '';
+
+    // Reset về giá trị mặc định
+    document.getElementById('student-name').textContent = 'John Smith';
+    document.getElementById('student-dob').textContent = '05/15/2002';
+    document.getElementById('student-id').textContent = 'SFC2024.1234567890';
+    // Course field is hidden, no need to reset
+
+    showNotification('✅ Đã xóa tất cả thông tin nhập', 'success');
+}
+
+// Điền dữ liệu ngẫu nhiên vào input fields
+function fillRandomData() {
+    const randomName = getRandomElement(usFirstNames) + ' ' + getRandomElement(usLastNames);
+    const randomDob = generateUSRandomDate();
+    const randomStudentId = generateUSStudentID('SFC');
+
+    document.getElementById('input-name').value = randomName;
+    document.getElementById('input-dob').value = randomDob;
+    document.getElementById('input-student-id').value = randomStudentId;
+
+    // Cập nhật thẻ ngay lập tức
+    updateCardFromInputs();
+
+    showNotification('🎲 Đã điền dữ liệu ngẫu nhiên', 'info');
+}
+
+// Cập nhật hàm generateUSStudentCard để sử dụng input nếu có
+function updateStudentCardWithInputs(studentData) {
+    const nameInput = document.getElementById('input-name');
+    const dobInput = document.getElementById('input-dob');
+    const studentIdInput = document.getElementById('input-student-id');
+
+    // Sử dụng input nếu có, ngược lại dùng dữ liệu random
+    if (nameInput && nameInput.value.trim()) {
+        studentData.name = nameInput.value.trim();
+    }
+
+    if (dobInput && dobInput.value.trim()) {
+        studentData.dateOfBirth = dobInput.value.trim();
+    }
+
+    if (studentIdInput && studentIdInput.value.trim()) {
+        studentData.studentId = studentIdInput.value.trim();
+    }
+
+    return studentData;
+}
+
+// Function to download clean back side (only logo and background)
+async function downloadBackSideClean() {
+    // Check if html2canvas is available
+    if (typeof html2canvas === 'undefined') {
+        throw new Error('html2canvas library not loaded');
+    }
+
+    // Clone the back side and clean it
+    const backClone = document.querySelector('.card-back').cloneNode(true);
+    backClone.style.position = 'relative';
+    backClone.style.transform = 'none';
+    backClone.style.backfaceVisibility = 'visible';
+    backClone.style.width = '540px';
+    backClone.style.height = '340px';
+
+    // Remove ALL text elements from back side - keep only logo and background
+    const textElementsToRemove = backClone.querySelectorAll('.back-text, .flip-hint');
+    textElementsToRemove.forEach(element => {
+        element.remove();
+    });
+
+    // Remove contact info div at bottom
+    const contactInfo = backClone.querySelector('div[style*="bottom: 30px"]');
+    if (contactInfo) {
+        contactInfo.remove();
+    }
+
+    // Remove any remaining text elements by searching for common text containers
+    const allDivs = backClone.querySelectorAll('div');
+    allDivs.forEach(div => {
+        // If div contains text but no logo image, remove it
+        if (div.innerText && div.innerText.trim() && !div.querySelector('img')) {
+            // Don't remove the back-logo container
+            if (!div.classList.contains('back-logo')) {
+                div.remove();
+            }
+        }
+    });
+
+    // Temporarily add to body for capturing
+    backClone.style.position = 'absolute';
+    backClone.style.left = '-9999px';
+    backClone.style.top = '-9999px';
+    document.body.appendChild(backClone);
+
+    try {
+        // Use html2canvas to capture the clean back side
+        const canvas = await html2canvas(backClone, {
+            scale: 2,
+            backgroundColor: null,
+            useCORS: true,
+            allowTaint: true,
+            foreignObjectRendering: true,
+            width: 540,
+            height: 340
+        });
+
+        // Download the image
+        const link = document.createElement('a');
+        link.download = 'student-card-back-clean.png';
+        link.href = canvas.toDataURL();
+        link.click();
+
+        console.log('✅ Downloaded BACK SIDE CLEAN: Only logo and background, all text removed');
+
+    } finally {
+        // Clean up
+        document.body.removeChild(backClone);
+    }
+}
+
+// ==================== CARD FLIP FUNCTIONS ====================
+
+// Flip card between front and back
+function flipCard() {
+    const card = document.querySelector('.card');
+    card.classList.toggle('flipped');
+
+    // Update download button text to reflect what will be downloaded
+    const downloadText = document.getElementById('download-text');
+    if (downloadText) {
+        if (card.classList.contains('flipped')) {
+            downloadText.textContent = '📥 Tải mặt sau (chỉ logo + nền)';
+        } else {
+            downloadText.textContent = '📥 Tải mặt trước (đầy đủ thông tin)';
+        }
+    }
+}
+
+// Update back side data when front side changes
+function updateBackSide() {
+    const universityName = document.getElementById('university-name').textContent;
+    const universityLogo = document.getElementById('university-logo').querySelector('img').src;
+
+    // Update back side elements
+    document.getElementById('back-university-name').textContent = universityName;
+    document.getElementById('back-university-logo').src = universityLogo;
+}
+
+// Download back side only (front side clean - only logo and background)
+async function downloadBackOnly() {
+    // Check if html2canvas is available
+    if (typeof html2canvas === 'undefined') {
+        showNotification('❌ html2canvas library not loaded. Please refresh the page.', 'error');
+        return;
+    }
+
+    try {
+        // Clone front side and make it clean (remove all text, keep only logo and background)
+        const frontClone = document.querySelector('.card-front').cloneNode(true);
+        frontClone.style.position = 'relative';
+        frontClone.style.transform = 'none';
+        frontClone.style.backfaceVisibility = 'visible';
+        frontClone.style.width = '540px';
+        frontClone.style.height = '320px';
+
+        // Clean front clone - hide content but keep structure for proper background/layout
+
+        // Hide university text from header, keep only logo
+        const universityInfo = frontClone.querySelector('.university-info');
+        if (universityInfo) {
+            universityInfo.style.display = 'none';
+        }
+
+        // Hide student info content  
+        const studentInfo = frontClone.querySelector('.student-info');
+        if (studentInfo) {
+            studentInfo.style.display = 'none';
+        }
+
+        // Hide student photo  
+        const studentPhoto = frontClone.querySelector('.student-photo');
+        if (studentPhoto) {
+            studentPhoto.style.display = 'none';
+        }
+
+        // Hide card footer (barcode)
+        const cardFooter = frontClone.querySelector('.card-footer');
+        if (cardFooter) {
+            cardFooter.style.display = 'none';
+        }
+
+        // Ensure CSS styles are properly applied for html2canvas
+        frontClone.style.background = 'white';
+        const cardHeader = frontClone.querySelector('.card-header');
+        if (cardHeader) {
+            cardHeader.style.background = 'linear-gradient(135deg, #059669 0%, #0891b2 100%)';
+            cardHeader.style.height = '90px';
+            cardHeader.style.display = 'flex';
+            cardHeader.style.alignItems = 'center';
+            cardHeader.style.padding = '0 25px';
+            cardHeader.style.color = 'white';
+        }
+
+        // Temporarily add to body for capturing
+        frontClone.style.position = 'absolute';
+        frontClone.style.left = '-9999px';
+        frontClone.style.top = '-9999px';
+        document.body.appendChild(frontClone);
+
+        try {
+            // Debug: Check what we have before capture
+            console.log('🔍 Before capture - Clone structure:');
+            console.log('- Logo exists:', frontClone.querySelector('#university-logo') ? 'YES' : 'NO');
+            console.log('- Header exists:', frontClone.querySelector('.card-header') ? 'YES' : 'NO');
+            console.log('- Header style:', frontClone.querySelector('.card-header')?.style.background || 'NONE');
+
+            // Wait a bit for styles to be applied
+            await new Promise(resolve => setTimeout(resolve, 100));
+
+            // Use html2canvas to capture the clean front side
+            const canvas = await html2canvas(frontClone, {
+                scale: 2,
+                backgroundColor: '#ffffff',
+                useCORS: true,
+                allowTaint: true,
+                foreignObjectRendering: true,
+                width: 540,
+                height: 320,
+                logging: true,
+                ignoreElements: function (element) {
+                    return false; // Don't ignore any elements
+                }
+            });
+
+            // Download the image
+            const link = document.createElement('a');
+            link.download = 'student-card-back-clean-from-front.png';
+            link.href = canvas.toDataURL();
+            link.click();
+
+            console.log('✅ Downloaded BACK SIDE CLEAN (from front): Only logo and background, all text removed');
+            console.log('📋 Canvas size:', canvas.width, 'x', canvas.height);
+            console.log('🎨 Clone had logo:', frontClone.querySelector('#university-logo') ? 'YES' : 'NO');
+            console.log('🎨 Clone had header:', frontClone.querySelector('.card-header') ? 'YES' : 'NO');
+            console.log('📝 Canvas data length:', canvas.toDataURL().length, 'characters');
+            showNotification('✅ Downloaded back side clean successfully!', 'success');
+
+        } finally {
+            // Clean up
+            document.body.removeChild(frontClone);
+        }
+
+    } catch (error) {
+        console.error('Download back only error:', error);
+        showNotification('❌ Download failed. Please try again.', 'error');
+    }
+}
+
+// Enhanced download function for both sides
+async function downloadBothSides() {
+    // Check if html2canvas is available
+    if (typeof html2canvas === 'undefined') {
+        showNotification('❌ html2canvas library not loaded. Please refresh the page.', 'error');
+        return;
+    }
+
+    try {
+        const card = document.querySelector('.card');
+        const isFlipped = card.classList.contains('flipped');
+
+        // Create a container for both sides
+        const bothSidesContainer = document.createElement('div');
+        bothSidesContainer.style.display = 'flex';
+        bothSidesContainer.style.gap = '20px';
+        bothSidesContainer.style.padding = '20px';
+        bothSidesContainer.style.background = 'white';
+
+        // Clone front side (full info)
+        const frontClone = document.querySelector('.card-front').cloneNode(true);
+        frontClone.style.position = 'relative';
+        frontClone.style.transform = 'none';
+        frontClone.style.backfaceVisibility = 'visible';
+
+        // Clone front side again for back side (clean version)
+        const backClone = document.querySelector('.card-front').cloneNode(true);
+        backClone.style.position = 'relative';
+        backClone.style.transform = 'none';
+        backClone.style.backfaceVisibility = 'visible';
+
+        // Clean back clone - hide content but keep structure for proper background/layout
+
+        // Hide university text from header, keep only logo
+        const universityInfoBack = backClone.querySelector('.university-info');
+        if (universityInfoBack) {
+            universityInfoBack.style.display = 'none';
+        }
+
+        // Hide student info content  
+        const studentInfoBack = backClone.querySelector('.student-info');
+        if (studentInfoBack) {
+            studentInfoBack.style.display = 'none';
+        }
+
+        // Hide student photo  
+        const studentPhotoBack = backClone.querySelector('.student-photo');
+        if (studentPhotoBack) {
+            studentPhotoBack.style.display = 'none';
+        }
+
+        // Hide card footer (barcode)
+        const cardFooterBack = backClone.querySelector('.card-footer');
+        if (cardFooterBack) {
+            cardFooterBack.style.display = 'none';
+        }
+
+        // Ensure CSS styles are properly applied for html2canvas (back side)
+        backClone.style.background = 'white';
+        const cardHeaderBack = backClone.querySelector('.card-header');
+        if (cardHeaderBack) {
+            cardHeaderBack.style.background = 'linear-gradient(135deg, #059669 0%, #0891b2 100%)';
+            cardHeaderBack.style.height = '90px';
+            cardHeaderBack.style.display = 'flex';
+            cardHeaderBack.style.alignItems = 'center';
+            cardHeaderBack.style.padding = '0 25px';
+            cardHeaderBack.style.color = 'white';
+        }
+
+        // Add labels
+        const frontLabel = document.createElement('div');
+        frontLabel.textContent = 'FRONT SIDE';
+        frontLabel.style.textAlign = 'center';
+        frontLabel.style.fontWeight = 'bold';
+        frontLabel.style.color = '#059669';
+        frontLabel.style.marginBottom = '10px';
+
+        const backLabel = document.createElement('div');
+        backLabel.textContent = 'BACK SIDE (FRONT CLEAN - LOGO ONLY)';
+        backLabel.style.textAlign = 'center';
+        backLabel.style.fontWeight = 'bold';
+        backLabel.style.color = '#059669';
+        backLabel.style.marginBottom = '10px';
+
+        // Create containers for each side
+        const frontContainer = document.createElement('div');
+        frontContainer.appendChild(frontLabel);
+        frontContainer.appendChild(frontClone);
+
+        const backContainer = document.createElement('div');
+        backContainer.appendChild(backLabel);
+        backContainer.appendChild(backClone);
+
+        bothSidesContainer.appendChild(frontContainer);
+        bothSidesContainer.appendChild(backContainer);
+
+        // Temporarily add to body
+        document.body.appendChild(bothSidesContainer);
+
+        // Use html2canvas to capture both sides
+        const canvas = await html2canvas(bothSidesContainer, {
+            scale: 2,
+            backgroundColor: '#ffffff',
+            useCORS: true,
+            allowTaint: true,
+            foreignObjectRendering: true,
+            logging: true,
+            ignoreElements: function (element) {
+                return false; // Don't ignore any elements
+            }
+        });
+
+        // Clean up
+        document.body.removeChild(bothSidesContainer);
+
+        // Download
+        const link = document.createElement('a');
+        link.download = 'student-card-both-sides.png';
+        link.href = canvas.toDataURL();
+        link.click();
+
+        console.log('✅ Downloaded BOTH SIDES: Front (full info) + Back (front clean - only logo & background)');
+        showNotification('✅ Downloaded both sides successfully!', 'success');
+
+    } catch (error) {
+        console.error('Download error:', error);
+        showNotification('❌ Download failed. Please try again.', 'error');
+    }
+}
+
+// Initialize when DOM is loaded
+document.addEventListener('DOMContentLoaded', function () {
+    console.log('US University Student Card Generator loaded');
+
+    // Điền dữ liệu mẫu ban đầu
+    setTimeout(() => {
+        fillRandomData();
+        updateBackSide(); // Sync back side
+
+        // Set initial download button text
+        const downloadText = document.getElementById('download-text');
+        if (downloadText) {
+            downloadText.textContent = '📥 Tải mặt trước (đầy đủ thông tin)';
+        }
+    }, 100);
+});
